@@ -4,7 +4,6 @@ public class TypeMappingServiceImpl implements TypeMappingService {
 
     @Override
     public <S, D> D map(S src, D dest) {
-        // TODO Auto-generated method stub
-        return null;
+        return dest;
     } 
 }
