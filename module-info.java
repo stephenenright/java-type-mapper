@@ -1,0 +1,3 @@
+module com.stephenenright.typemapper {
+	
+}
