@@ -19,14 +19,9 @@ public class TypeMappingServiceImplTest {
     @Test
     public void map() {
         VendingMachine source = new VendingMachine();
-        VendingMachineDto destination = new VendingMachineDto();
-        
-        VendingMachineDto result = mappingService.map(source, destination);
-        
+        VendingMachineDto result = mappingService.map(source, VendingMachineDto.class);
+
         Assert.assertTrue(result.getClass().isAssignableFrom(VendingMachineDto.class));
-        
-        
-        
 
     }
 }
