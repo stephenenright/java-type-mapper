@@ -1,5 +1,7 @@
 package com.stephenenright.typemapper.internal.util;
 
+import java.util.TimeZone;
+
 public abstract class StringUtils {
 
     private StringUtils() {
@@ -31,6 +33,14 @@ public abstract class StringUtils {
         }
 
         return builder.toString();
+    }
+
+    public static TimeZone timezoneFromString(String timeZoneString) {
+        TimeZone timeZone = TimeZone.getTimeZone(timeZoneString);
+        if ("GMT".equals(timeZone.getID()) && !timeZoneString.startsWith("GMT")) {
+            throw new IllegalArgumentException("Time zone not valid: " + timeZoneString);
+        }
+        return timeZone;
     }
 
 }

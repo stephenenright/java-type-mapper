@@ -11,7 +11,7 @@ import com.stephenenright.typemapper.converter.TypePredicateConverter;
 import com.stephenenright.typemapper.converter.TypePredicateConverter.PredicateResult;
 import com.stephenenright.typemapper.internal.collection.ConcurrentReferenceHashMap;
 import com.stephenenright.typemapper.internal.conversion.TypeConverterAdapters.TypeConverterFactoryAdapter;
-import com.stephenenright.typemapper.internal.conversion.converter.NullableConverter;
+import com.stephenenright.typemapper.internal.conversion.converter.NullableTypeConverter;
 import com.stephenenright.typemapper.internal.util.ReflectionUtils;
 
 public class TypeConverterCollectionImpl implements TypeConverterCollection {
@@ -60,7 +60,7 @@ public class TypeConverterCollectionImpl implements TypeConverterCollection {
             }
         }
 
-        convertersCache.put(key, NullableConverter.INSTANCE);
+        convertersCache.put(key, NullableTypeConverter.INSTANCE);
         return null;
     }
 
