@@ -5,4 +5,6 @@ import com.stephenenright.typemapper.internal.conversion.converter.TypeValueConv
 
 public interface TypeValueConverterFactory<S, ST> {
     <T extends ST> TypeValueConverter<S, T> getTypeValueConverter(TypeMappingContext<?, ?> context);
+
+    <T extends ST> TypeValueConverter<S, T> getTypeValueConverter(Class<T> destinationType);
 }

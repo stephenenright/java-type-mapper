@@ -14,6 +14,15 @@ public abstract class TypeUtils {
 
     }
 
+    public static Class<?> getEnumType(Class<?> targetType) {
+        Class<?> enumType = targetType;
+        while (enumType != null && !enumType.isEnum()) {
+            enumType = enumType.getSuperclass();
+        }
+
+        return enumType;
+    }
+
     public static Class<?> getRawType(Type type) {
         if (type instanceof Class<?>) {
             return (Class<?>) type;

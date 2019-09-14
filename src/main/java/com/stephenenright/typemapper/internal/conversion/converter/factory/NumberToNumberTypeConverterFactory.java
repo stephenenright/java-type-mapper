@@ -15,15 +15,16 @@ public class NumberToNumberTypeConverterFactory
 
     public static NumberToNumberTypeConverterFactory INSTANCE = new NumberToNumberTypeConverterFactory();
 
+   
     @Override
     public <T extends Number> TypeConverter<Number, T> getTypeConverter(TypeMappingContext<?, ?> context) {
-        return getTypeConverterInternal(context);
+        return getTypeConverterInternal(context.getDestinationType());
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Number> TypeValueConverter<Number, T> getTypeValueConverter(TypeMappingContext<?, ?> context) {
-        TypeConverter<Number, T> conveter = getTypeConverterInternal(context);
+        TypeConverter<Number, T> conveter = getTypeConverterInternal(context.getDestinationType());
 
         if (conveter != null) {
             return (TypeValueConverter<Number, T>) conveter;
@@ -33,9 +34,21 @@ public class NumberToNumberTypeConverterFactory
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Number> TypeConverter<Number, T> getTypeConverterInternal(TypeMappingContext<?, ?> context) {
+    @Override
+    public <T extends Number> TypeValueConverter<Number, T> getTypeValueConverter(Class<T> destinationType) {
+        TypeConverter<Number, T> conveter = getTypeConverterInternal(destinationType);
 
-        Class<?> destinationType = ClassUtils.resolvePrimitiveAsWrapperIfNessecary(context.getDestinationType());
+        if (conveter != null) {
+            return (TypeValueConverter<Number, T>) conveter;
+        }
+
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Number> TypeConverter<Number, T> getTypeConverterInternal(Class<?> targetType) {
+
+        Class<?> destinationType = ClassUtils.resolvePrimitiveAsWrapperIfNessecary(targetType);
         AssertUtils.notNull(destinationType, "Target type must not be null");
 
         if (Byte.class == destinationType) {
