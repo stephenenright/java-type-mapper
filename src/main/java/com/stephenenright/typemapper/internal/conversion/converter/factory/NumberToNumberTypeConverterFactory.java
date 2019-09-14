@@ -6,16 +6,34 @@ import java.math.BigInteger;
 import com.stephenenright.typemapper.TypeMappingContext;
 import com.stephenenright.typemapper.converter.TypeConverter;
 import com.stephenenright.typemapper.converter.TypeConverterFactory;
+import com.stephenenright.typemapper.internal.conversion.converter.TypeValueConverter;
 import com.stephenenright.typemapper.internal.util.AssertUtils;
 import com.stephenenright.typemapper.internal.util.ClassUtils;
 
-public class NumberToNumberTypeConverterFactory implements TypeConverterFactory<Number, Number> {
+public class NumberToNumberTypeConverterFactory
+        implements TypeConverterFactory<Number, Number>, TypeValueConverterFactory<Number, Number> {
 
     public static NumberToNumberTypeConverterFactory INSTANCE = new NumberToNumberTypeConverterFactory();
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T extends Number> TypeConverter<Number, T> getTypeConverter(TypeMappingContext<?, ?> context) {
+        return getTypeConverterInternal(context);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T extends Number> TypeValueConverter<Number, T> getTypeValueConverter(TypeMappingContext<?, ?> context) {
+        TypeConverter<Number, T> conveter = getTypeConverterInternal(context);
+
+        if (conveter != null) {
+            return (TypeValueConverter<Number, T>) conveter;
+        }
+
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Number> TypeConverter<Number, T> getTypeConverterInternal(TypeMappingContext<?, ?> context) {
 
         Class<?> destinationType = ClassUtils.resolvePrimitiveAsWrapperIfNessecary(context.getDestinationType());
         AssertUtils.notNull(destinationType, "Target type must not be null");
@@ -37,7 +55,7 @@ public class NumberToNumberTypeConverterFactory implements TypeConverterFactory<
         } else if (BigDecimal.class == destinationType) {
             return (TypeConverter<Number, T>) NumberToBigDecimalTypeConverter.INSTANCE;
         } else {
-            throw new IllegalArgumentException("Unsupported number type: " + destinationType.getName());
+            return null;
         }
     }
 
@@ -83,13 +101,18 @@ public class NumberToNumberTypeConverterFactory implements TypeConverterFactory<
         }
     }
 
-    private static final class NumberToByteTypeConverter extends NumberToNumberBaseTypeConverter<Byte> {
+    private static final class NumberToByteTypeConverter extends NumberToNumberBaseTypeConverter<Byte>
+            implements TypeValueConverter<Number, Byte> {
 
         public static final NumberToByteTypeConverter INSTANCE = new NumberToByteTypeConverter();
 
         @Override
         public Byte convert(TypeMappingContext<Number, Byte> context) {
-            Number value = context.getSource();
+            return convertValue(context.getSource());
+        }
+
+        @Override
+        public Byte convertValue(Number value) {
             if (value == null) {
                 return null;
             }
@@ -115,13 +138,18 @@ public class NumberToNumberTypeConverterFactory implements TypeConverterFactory<
 
     }
 
-    private static final class NumberToShortTypeConverter extends NumberToNumberBaseTypeConverter<Short> {
+    private static final class NumberToShortTypeConverter extends NumberToNumberBaseTypeConverter<Short>
+            implements TypeValueConverter<Number, Short> {
 
         public static final NumberToShortTypeConverter INSTANCE = new NumberToShortTypeConverter();
 
         @Override
         public Short convert(TypeMappingContext<Number, Short> context) {
-            Number value = context.getSource();
+            return convertValue(context.getSource());
+        }
+
+        @Override
+        public Short convertValue(Number value) {
             if (value == null) {
                 return null;
             }
@@ -143,18 +171,22 @@ public class NumberToNumberTypeConverterFactory implements TypeConverterFactory<
             }
 
             return Short.valueOf(value.byteValue());
-
         }
+
     }
 
-    private static final class NumberToIntegerTypeConverter extends NumberToNumberBaseTypeConverter<Integer> {
+    private static final class NumberToIntegerTypeConverter extends NumberToNumberBaseTypeConverter<Integer>
+            implements TypeValueConverter<Number, Integer> {
 
         public static final NumberToIntegerTypeConverter INSTANCE = new NumberToIntegerTypeConverter();
 
         @Override
         public Integer convert(TypeMappingContext<Number, Integer> context) {
-            Number value = context.getSource();
+            return convertValue(context.getSource());
+        }
 
+        @Override
+        public Integer convertValue(Number value) {
             if (value == null) {
                 return null;
             }
@@ -176,19 +208,22 @@ public class NumberToNumberTypeConverterFactory implements TypeConverterFactory<
             }
 
             return Integer.valueOf(value.byteValue());
-
         }
 
     }
 
-    private static final class NumberToLongTypeConverter extends NumberToNumberBaseTypeConverter<Long> {
+    private static final class NumberToLongTypeConverter extends NumberToNumberBaseTypeConverter<Long>
+            implements TypeValueConverter<Number, Long> {
 
         public static final NumberToLongTypeConverter INSTANCE = new NumberToLongTypeConverter();
 
         @Override
         public Long convert(TypeMappingContext<Number, Long> context) {
-            Number value = context.getSource();
+            return convertValue(context.getSource());
+        }
 
+        @Override
+        public Long convertValue(Number value) {
             if (value == null) {
                 return null;
             }
@@ -201,18 +236,22 @@ public class NumberToNumberTypeConverterFactory implements TypeConverterFactory<
 
             toLongWithBoundsCheck(value, Long.class);
             return Long.valueOf(value.longValue());
-
         }
+
     }
 
-    private static final class NumberToFloatTypeConverter extends NumberToNumberBaseTypeConverter<Float> {
+    private static final class NumberToFloatTypeConverter extends NumberToNumberBaseTypeConverter<Float>
+            implements TypeValueConverter<Number, Float> {
 
         public static final NumberToFloatTypeConverter INSTANCE = new NumberToFloatTypeConverter();
 
         @Override
         public Float convert(TypeMappingContext<Number, Float> context) {
-            Number value = context.getSource();
+            return convertValue(context.getSource());
+        }
 
+        @Override
+        public Float convertValue(Number value) {
             if (value == null) {
                 return null;
             }
@@ -224,18 +263,23 @@ public class NumberToNumberTypeConverterFactory implements TypeConverterFactory<
             }
 
             return Float.valueOf(value.floatValue());
-
         }
+
     }
 
-    private static final class NumberToDoubleTypeConverter extends NumberToNumberBaseTypeConverter<Double> {
+    private static final class NumberToDoubleTypeConverter extends NumberToNumberBaseTypeConverter<Double>
+            implements TypeValueConverter<Number, Double> {
 
         public static final NumberToDoubleTypeConverter INSTANCE = new NumberToDoubleTypeConverter();
 
         @Override
         public Double convert(TypeMappingContext<Number, Double> context) {
-            Number value = context.getSource();
+            return convertValue(context.getSource());
 
+        }
+
+        @Override
+        public Double convertValue(Number value) {
             if (value == null) {
                 return null;
             }
@@ -248,16 +292,21 @@ public class NumberToNumberTypeConverterFactory implements TypeConverterFactory<
 
             return Double.valueOf(value.doubleValue());
         }
+
     }
 
-    private static final class NumberToBigIntegerTypeConverter extends NumberToNumberBaseTypeConverter<BigInteger> {
+    private static final class NumberToBigIntegerTypeConverter extends NumberToNumberBaseTypeConverter<BigInteger>
+            implements TypeValueConverter<Number, BigInteger> {
 
         public static final NumberToBigIntegerTypeConverter INSTANCE = new NumberToBigIntegerTypeConverter();
 
         @Override
         public BigInteger convert(TypeMappingContext<Number, BigInteger> context) {
-            Number value = context.getSource();
+            return convertValue(context.getSource());
+        }
 
+        @Override
+        public BigInteger convertValue(Number value) {
             if (value == null) {
                 return null;
             }
@@ -274,16 +323,22 @@ public class NumberToNumberTypeConverterFactory implements TypeConverterFactory<
                 return BigInteger.valueOf(value.longValue());
             }
         }
+
     }
 
-    private static final class NumberToBigDecimalTypeConverter extends NumberToNumberBaseTypeConverter<BigDecimal> {
+    private static final class NumberToBigDecimalTypeConverter extends NumberToNumberBaseTypeConverter<BigDecimal>
+            implements TypeValueConverter<Number, BigDecimal> {
 
         public static final NumberToBigDecimalTypeConverter INSTANCE = new NumberToBigDecimalTypeConverter();
 
         @Override
         public BigDecimal convert(TypeMappingContext<Number, BigDecimal> context) {
-            Number value = context.getSource();
+            return convertValue(context.getSource());
 
+        }
+
+        @Override
+        public BigDecimal convertValue(Number value) {
             if (value == null) {
                 return null;
             }
@@ -295,7 +350,7 @@ public class NumberToNumberTypeConverterFactory implements TypeConverterFactory<
             }
 
             return new BigDecimal(value.toString());
-
         }
+
     }
 }
