@@ -62,7 +62,7 @@ public class CharacterToNumberTypeConverterFactory implements TypeConverterFacto
 
         @Override
         public Byte convert(TypeMappingContext<Character, Byte> context) {
-            return convert(context);
+            return convertNumber(context);
         }
     }
 
@@ -82,7 +82,7 @@ public class CharacterToNumberTypeConverterFactory implements TypeConverterFacto
 
         @Override
         public Integer convert(TypeMappingContext<Character, Integer> context) {
-            return convert(context);
+            return convertNumber(context);
         }
     }
 
@@ -92,7 +92,7 @@ public class CharacterToNumberTypeConverterFactory implements TypeConverterFacto
 
         @Override
         public Long convert(TypeMappingContext<Character, Long> context) {
-            return convert(context);
+            return convertNumber(context);
         }
     }
 
@@ -102,7 +102,7 @@ public class CharacterToNumberTypeConverterFactory implements TypeConverterFacto
 
         @Override
         public Float convert(TypeMappingContext<Character, Float> context) {
-            return convert(context);
+            return convertNumber(context);
         }
     }
 
@@ -112,7 +112,7 @@ public class CharacterToNumberTypeConverterFactory implements TypeConverterFacto
 
         @Override
         public Double convert(TypeMappingContext<Character, Double> context) {
-            return convert(context);
+            return convertNumber(context);
         }
     }
 
@@ -123,7 +123,7 @@ public class CharacterToNumberTypeConverterFactory implements TypeConverterFacto
 
         @Override
         public BigInteger convert(TypeMappingContext<Character, BigInteger> context) {
-            return convert(context);
+            return convertNumber(context);
         }
     }
 
@@ -134,8 +134,7 @@ public class CharacterToNumberTypeConverterFactory implements TypeConverterFacto
 
         @Override
         public BigDecimal convert(TypeMappingContext<Character, BigDecimal> context) {
-            return convert(context);
+            return convertNumber(context);
         }
     }
-
 }
