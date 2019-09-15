@@ -22,7 +22,9 @@ import com.stephenenright.typemapper.internal.conversion.converter.ZoneIdToTimeZ
 import com.stephenenright.typemapper.internal.conversion.converter.ZonedDateTimeToCalendarTypeConverter;
 import com.stephenenright.typemapper.internal.conversion.converter.ZonedDateTimeToLongTypeConverter;
 import com.stephenenright.typemapper.internal.conversion.converter.ZonedDateTimeToStringTypeConverter;
+import com.stephenenright.typemapper.internal.conversion.converter.ZonedDateTimeToZoneIdTypeConverter;
 import com.stephenenright.typemapper.internal.conversion.converter.factory.CharacterToNumberTypeConverterFactory;
+import com.stephenenright.typemapper.internal.conversion.converter.factory.DateToObjectTypeConverterFactory;
 import com.stephenenright.typemapper.internal.conversion.converter.factory.EnumToNumberTypeConverterFactory;
 import com.stephenenright.typemapper.internal.conversion.converter.factory.NumberToNumberTypeConverterFactory;
 import com.stephenenright.typemapper.internal.conversion.converter.factory.ObjectToDateTypeConverterFactory;
@@ -57,12 +59,14 @@ public class TypeConverterCollectionDefaultImpl extends TypeConverterCollectionI
         add(ZonedDateTimeToCalendarTypeConverter.INSTANCE);
         add(ZonedDateTimeToLongTypeConverter.INSTANCE);
         add(ZonedDateTimeToStringTypeConverter.INSTANCE);
+        add(ZonedDateTimeToZoneIdTypeConverter.INSTANCE);
         add(ZoneIdToTimeZoneTypeConverter.INSTANCE);
 
     }
 
     private void addDefaultConverterFactories() {
         add(CharacterToNumberTypeConverterFactory.INSTANCE);
+        add(DateToObjectTypeConverterFactory.INSTANCE);
         add(EnumToNumberTypeConverterFactory.INSTANCE);
         add(NumberToNumberTypeConverterFactory.INSTANCE);
         add(ObjectToDateTypeConverterFactory.INSTANCE);

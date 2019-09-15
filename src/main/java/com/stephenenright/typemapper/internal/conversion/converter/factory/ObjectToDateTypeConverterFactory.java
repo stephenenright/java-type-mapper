@@ -19,10 +19,6 @@ public class ObjectToDateTypeConverterFactory implements TypeConverterFactory<Ob
     public <T extends Date> TypeConverter<Object, T> getTypeConverter(TypeMappingContext<?, ?> context) {
         Object source = context.getSource();
 
-        if (source == null) {
-            return null;
-        }
-
         if (source instanceof Long) {
             return (TypeConverter<Object, T>) LongToDateTypeConverter.INSTANCE;
         } else if (source instanceof String) {
