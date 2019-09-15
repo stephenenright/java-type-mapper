@@ -3,6 +3,8 @@ package com.stephenenright.typemapper.internal;
 import java.lang.reflect.Type;
 
 import com.stephenenright.typemapper.TypeMappingContext;
+import com.stephenenright.typemapper.TypeToken;
+import com.stephenenright.typemapper.internal.util.ProxyUtils;
 
 public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
 
@@ -11,6 +13,11 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
     private final Class<D> destinationType;
     private D destination;
     private final Type genericDestinationType;
+
+    public  TypeMappingContextImpl(S source, Class<D> destinationType) {
+        this(source, ProxyUtils.unProxy(source.getClass()), null,
+                destinationType,TypeToken.<D>of(destinationType).getType());
+    }
 
     public TypeMappingContextImpl(S source, Class<S> sourceType, D destination, Class<D> destinationType,
             Type genericDestinationType) {
