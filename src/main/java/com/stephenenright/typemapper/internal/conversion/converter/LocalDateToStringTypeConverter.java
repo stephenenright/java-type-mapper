@@ -8,6 +8,8 @@ import com.stephenenright.typemapper.internal.util.JavaTimeUtils;
 
 public class LocalDateToStringTypeConverter implements TypeConverter<LocalDate, String> {
 
+    public static final LocalDateToStringTypeConverter INSTANCE = new LocalDateToStringTypeConverter();
+
     @Override
     public String convert(TypeMappingContext<LocalDate, String> context) {
         LocalDate value = context.getSource();

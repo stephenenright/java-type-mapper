@@ -8,6 +8,8 @@ import com.stephenenright.typemapper.converter.TypeConverter;
 
 public class ZoneIdToTimeZoneTypeConverter implements TypeConverter<ZoneId, TimeZone> {
 
+    public static final ZoneIdToTimeZoneTypeConverter INSTANCE = new ZoneIdToTimeZoneTypeConverter();
+
     @Override
     public TimeZone convert(TypeMappingContext<ZoneId, TimeZone> context) {
         ZoneId value = context.getSource();
@@ -15,7 +17,7 @@ public class ZoneIdToTimeZoneTypeConverter implements TypeConverter<ZoneId, Time
         if (value == null) {
             return null;
         }
-        
+
         return TimeZone.getTimeZone(value);
     }
 }

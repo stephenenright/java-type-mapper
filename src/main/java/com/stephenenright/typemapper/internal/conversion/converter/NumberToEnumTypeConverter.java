@@ -5,12 +5,13 @@ import com.stephenenright.typemapper.converter.TypeConverter;
 import com.stephenenright.typemapper.internal.conversion.converter.factory.NumberToNumberTypeConverterFactory;
 import com.stephenenright.typemapper.internal.util.AssertUtils;
 
-public class NumberToEnumTypeConverter implements TypeConverter<Number, Enum<?>> {
+@SuppressWarnings("rawtypes")
+public class NumberToEnumTypeConverter implements TypeConverter<Number, Enum> {
 
     public static final NumberToEnumTypeConverter INSTANCE = new NumberToEnumTypeConverter();
 
     @Override
-    public Enum<?> convert(TypeMappingContext<Number, Enum<?>> context) {
+    public Enum<?> convert(TypeMappingContext<Number, Enum> context) {
         Number value = context.getSource();
 
         if (value == null) {

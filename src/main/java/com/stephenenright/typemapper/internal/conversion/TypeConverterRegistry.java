@@ -7,7 +7,7 @@ import com.stephenenright.typemapper.converter.TypeConverterFactory;
 
 public interface TypeConverterRegistry {
     
-    public TypeConverter<?, ?> getConverter(Class<?> sourceType, Class<?> destinationType);
+    public <S, D> TypeConverter<S, D> getConverter(Class<?> sourceType, Class<?> destinationType);
     
     public void registerConverterFactories(List<TypeConverterFactory<?, ?>> factories);
 

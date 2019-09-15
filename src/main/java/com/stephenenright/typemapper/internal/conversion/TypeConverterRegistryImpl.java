@@ -13,9 +13,21 @@ public class TypeConverterRegistryImpl implements TypeConverterRegistry {
         this.converterCollection = new TypeConverterCollectionImpl();
     }
 
+    public TypeConverterRegistryImpl(TypeConverterCollection converterCollection) {
+        this.converterCollection = converterCollection;
+    }
+
+    @SuppressWarnings("unchecked")
     @Override
-    public TypeConverter<?, ?> getConverter(Class<?> sourceType, Class<?> destinationType) {
-        return converterCollection.findConverter(sourceType, destinationType);
+    public <S, D> TypeConverter<S, D> getConverter(Class<?> sourceType, Class<?> destinationType) {
+        TypeConverter<?, ?> converter = converterCollection.findConverter(sourceType, destinationType);
+
+        if (converter != null) {
+            return (TypeConverter<S, D>) converter;
+        }
+
+        return null;
+
     }
 
     @Override

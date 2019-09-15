@@ -10,38 +10,41 @@ import com.stephenenright.typemapper.internal.conversion.converter.TypeValueConv
 import com.stephenenright.typemapper.internal.util.AssertUtils;
 import com.stephenenright.typemapper.internal.util.ClassUtils;
 
-public class EnumToNumberTypeConverterFactory implements TypeConverterFactory<Enum<?>, Number> {
+@SuppressWarnings("rawtypes")
+public class EnumToNumberTypeConverterFactory implements TypeConverterFactory<Enum, Number> {
 
-    @SuppressWarnings("unchecked")
+    public static EnumToNumberTypeConverterFactory INSTANCE = new EnumToNumberTypeConverterFactory();
+
+    @SuppressWarnings({ "unchecked"})
     @Override
-    public <T extends Number> TypeConverter<Enum<?>, T> getTypeConverter(TypeMappingContext<?, ?> context) {
+    public <T extends Number> TypeConverter<Enum, T> getTypeConverter(TypeMappingContext<?, ?> context) {
         Class<?> destinationType = ClassUtils.resolvePrimitiveAsWrapperIfNessecary(context.getDestinationType());
         AssertUtils.notNull(destinationType, "Target type must not be null");
 
         if (Byte.class == destinationType) {
-            return (TypeConverter<Enum<?>, T>) EnumToByteTypeConverter.INSTANCE;
+            return (TypeConverter<Enum, T>) EnumToByteTypeConverter.INSTANCE;
         } else if (Short.class == destinationType) {
-            return (TypeConverter<Enum<?>, T>) EnumToShortTypeConverter.INSTANCE;
+            return (TypeConverter<Enum, T>) EnumToShortTypeConverter.INSTANCE;
         } else if (Integer.class == destinationType) {
-            return (TypeConverter<Enum<?>, T>) EnumToIntegerTypeConverter.INSTANCE;
+            return (TypeConverter<Enum, T>) EnumToIntegerTypeConverter.INSTANCE;
         } else if (Long.class == destinationType) {
-            return (TypeConverter<Enum<?>, T>) EnumToLongTypeConverter.INSTANCE;
+            return (TypeConverter<Enum, T>) EnumToLongTypeConverter.INSTANCE;
         } else if (Float.class == destinationType) {
-            return (TypeConverter<Enum<?>, T>) EnumToFloatTypeConverter.INSTANCE;
+            return (TypeConverter<Enum, T>) EnumToFloatTypeConverter.INSTANCE;
         } else if (Double.class == destinationType) {
-            return (TypeConverter<Enum<?>, T>) EnumToDoubleTypeConverter.INSTANCE;
+            return (TypeConverter<Enum, T>) EnumToDoubleTypeConverter.INSTANCE;
         } else if (BigInteger.class == destinationType) {
-            return (TypeConverter<Enum<?>, T>) EnumToBigIntegerTypeConverter.INSTANCE;
+            return (TypeConverter<Enum, T>) EnumToBigIntegerTypeConverter.INSTANCE;
         } else if (BigDecimal.class == destinationType) {
-            return (TypeConverter<Enum<?>, T>) EnumToBigDecimalTypeConverter.INSTANCE;
+            return (TypeConverter<Enum, T>) EnumToBigDecimalTypeConverter.INSTANCE;
         } else {
             throw new IllegalArgumentException("Unsupported number type: " + destinationType.getName());
         }
     }
 
-    private static abstract class EnumToNumberBaseTypeConverter<T extends Number> implements TypeConverter<Enum<?>, T> {
+    private static abstract class EnumToNumberBaseTypeConverter<T extends Number> implements TypeConverter<Enum, T> {
 
-        protected T convertEnum(TypeMappingContext<Enum<?>, ? extends Number> context) {
+        protected T convertEnum(TypeMappingContext<Enum, ? extends Number> context) {
             Enum<?> value = context.getSource();
             if (value == null) {
                 return null;
@@ -58,7 +61,7 @@ public class EnumToNumberTypeConverterFactory implements TypeConverterFactory<En
         public static final EnumToByteTypeConverter INSTANCE = new EnumToByteTypeConverter();
 
         @Override
-        public Byte convert(TypeMappingContext<Enum<?>, Byte> context) {
+        public Byte convert(TypeMappingContext<Enum, Byte> context) {
             return convertEnum(context);
         }
     }
@@ -68,7 +71,7 @@ public class EnumToNumberTypeConverterFactory implements TypeConverterFactory<En
         public static final EnumToShortTypeConverter INSTANCE = new EnumToShortTypeConverter();
 
         @Override
-        public Short convert(TypeMappingContext<Enum<?>, Short> context) {
+        public Short convert(TypeMappingContext<Enum, Short> context) {
             return convert(context);
         }
     }
@@ -78,7 +81,7 @@ public class EnumToNumberTypeConverterFactory implements TypeConverterFactory<En
         public static final EnumToIntegerTypeConverter INSTANCE = new EnumToIntegerTypeConverter();
 
         @Override
-        public Integer convert(TypeMappingContext<Enum<?>, Integer> context) {
+        public Integer convert(TypeMappingContext<Enum, Integer> context) {
             return convertEnum(context);
         }
     }
@@ -88,7 +91,7 @@ public class EnumToNumberTypeConverterFactory implements TypeConverterFactory<En
         public static final EnumToLongTypeConverter INSTANCE = new EnumToLongTypeConverter();
 
         @Override
-        public Long convert(TypeMappingContext<Enum<?>, Long> context) {
+        public Long convert(TypeMappingContext<Enum, Long> context) {
             return convertEnum(context);
         }
     }
@@ -98,7 +101,7 @@ public class EnumToNumberTypeConverterFactory implements TypeConverterFactory<En
         public static final EnumToFloatTypeConverter INSTANCE = new EnumToFloatTypeConverter();
 
         @Override
-        public Float convert(TypeMappingContext<Enum<?>, Float> context) {
+        public Float convert(TypeMappingContext<Enum, Float> context) {
             return convertEnum(context);
         }
     }
@@ -108,7 +111,7 @@ public class EnumToNumberTypeConverterFactory implements TypeConverterFactory<En
         public static final EnumToDoubleTypeConverter INSTANCE = new EnumToDoubleTypeConverter();
 
         @Override
-        public Double convert(TypeMappingContext<Enum<?>, Double> context) {
+        public Double convert(TypeMappingContext<Enum, Double> context) {
             return convertEnum(context);
         }
     }
@@ -118,7 +121,7 @@ public class EnumToNumberTypeConverterFactory implements TypeConverterFactory<En
         public static final EnumToBigIntegerTypeConverter INSTANCE = new EnumToBigIntegerTypeConverter();
 
         @Override
-        public BigInteger convert(TypeMappingContext<Enum<?>, BigInteger> context) {
+        public BigInteger convert(TypeMappingContext<Enum, BigInteger> context) {
             return convertEnum(context);
         }
     }
@@ -128,7 +131,7 @@ public class EnumToNumberTypeConverterFactory implements TypeConverterFactory<En
         public static final EnumToBigDecimalTypeConverter INSTANCE = new EnumToBigDecimalTypeConverter();
 
         @Override
-        public BigDecimal convert(TypeMappingContext<Enum<?>, BigDecimal> context) {
+        public BigDecimal convert(TypeMappingContext<Enum, BigDecimal> context) {
             return convertEnum(context);
         }
     }

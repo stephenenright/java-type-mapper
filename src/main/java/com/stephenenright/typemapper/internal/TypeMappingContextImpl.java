@@ -13,19 +13,21 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
     private final Class<D> destinationType;
     private D destination;
     private final Type genericDestinationType;
+    private final TypeMappingService mappingService;
 
-    public  TypeMappingContextImpl(S source, Class<D> destinationType) {
+    public  TypeMappingContextImpl(S source, Class<D> destinationType, TypeMappingService mappingService) {
         this(source, ProxyUtils.unProxy(source.getClass()), null,
-                destinationType,TypeToken.<D>of(destinationType).getType());
+                destinationType,TypeToken.<D>of(destinationType).getType(), mappingService);
     }
 
     public TypeMappingContextImpl(S source, Class<S> sourceType, D destination, Class<D> destinationType,
-            Type genericDestinationType) {
+            Type genericDestinationType,TypeMappingService mappingService) {
         this.source = source;
         this.sourceType = sourceType;
         this.destination = destination;
         this.destinationType = destinationType;
         this.genericDestinationType = genericDestinationType;
+        this.mappingService = mappingService;
     }
 
     @Override
@@ -53,4 +55,7 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
         return genericDestinationType;
     }
 
+    public TypeMappingService getMappingService() {
+        return mappingService;
+    }
 }

@@ -8,6 +8,8 @@ import com.stephenenright.typemapper.converter.TypeConverter;
 
 public class LocalDateToLongTypeConverter implements TypeConverter<LocalDate, Long> {
 
+    public static final LocalDateToLongTypeConverter INSTANCE = new LocalDateToLongTypeConverter();
+
     @Override
     public Long convert(TypeMappingContext<LocalDate, Long> context) {
         LocalDate value = context.getSource();

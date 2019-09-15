@@ -9,14 +9,16 @@ import com.stephenenright.typemapper.converter.TypeConverter;
 
 public class LongToZonedDateTimeTypeConverter implements TypeConverter<Long, ZonedDateTime> {
 
+    public static final LongToZonedDateTimeTypeConverter INSTANCE = new LongToZonedDateTimeTypeConverter();
+
     @Override
-    public  ZonedDateTime convert(TypeMappingContext<Long,  ZonedDateTime> context) {
+    public ZonedDateTime convert(TypeMappingContext<Long, ZonedDateTime> context) {
         Long value = context.getSource();
 
         if (value == null) {
             return null;
         }
-        
+
         Instant instant = Instant.ofEpochMilli(value);
         return ZonedDateTime.ofInstant(instant, ZoneId.systemDefault());
     }

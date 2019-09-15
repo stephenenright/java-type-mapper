@@ -8,6 +8,9 @@ import com.stephenenright.typemapper.internal.util.StringUtils;
 
 public class StringToTimeZoneTypeConverter implements TypeConverter<String, TimeZone> {
 
+    public static final StringToTimeZoneTypeConverter INSTANCE = new StringToTimeZoneTypeConverter();
+    
+    
     @Override
     public TimeZone convert(TypeMappingContext<String, TimeZone> context) {
         String value = context.getSource();

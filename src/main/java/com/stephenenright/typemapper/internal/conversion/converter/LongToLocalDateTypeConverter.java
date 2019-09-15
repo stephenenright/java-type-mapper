@@ -9,6 +9,8 @@ import com.stephenenright.typemapper.converter.TypeConverter;
 
 public class LongToLocalDateTypeConverter implements TypeConverter<Long, LocalDate> {
 
+    public static final LongToLocalDateTypeConverter INSTANCE = new LongToLocalDateTypeConverter();
+
     @Override
     public LocalDate convert(TypeMappingContext<Long, LocalDate> context) {
         Long value = context.getSource();
@@ -16,7 +18,7 @@ public class LongToLocalDateTypeConverter implements TypeConverter<Long, LocalDa
         if (value == null) {
             return null;
         }
-        
+
         Instant instant = Instant.ofEpochMilli(value);
         return LocalDate.ofInstant(instant, ZoneId.systemDefault());
     }

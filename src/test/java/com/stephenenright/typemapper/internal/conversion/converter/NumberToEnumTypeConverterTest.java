@@ -8,16 +8,18 @@ import org.junit.Test;
 import com.stephenenright.typemapper.TypeMappingContext;
 import com.stephenenright.typemapper.internal.TypeMappingContextImpl;
 import com.stephenenright.typemapper.internal.util.TypeUtils;
+import com.stephenenright.typemapper.test.fixture.utils.FixtureUtils;
 import com.stephenenright.typemapper.test.models.vending.VendingMachineStatus;
 
 public class NumberToEnumTypeConverterTest {
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Test
     public void convert_double() {
 
-        TypeMappingContext<Number, Enum<?>> context = new TypeMappingContextImpl<Number, Enum<?>>(1.0d,
-                (Class<Enum<?>>) TypeUtils.getEnumType(VendingMachineStatus.class));
+        TypeMappingContext<Number, Enum> context = new TypeMappingContextImpl<Number, Enum>(1.0d,
+                (Class<Enum>) TypeUtils.getEnumType(VendingMachineStatus.class), 
+                FixtureUtils.createDefaultMappingService());
 
         Enum<?> enumResult = NumberToEnumTypeConverter.INSTANCE.convert(context);
         assertTrue(enumResult instanceof VendingMachineStatus);

@@ -9,6 +9,8 @@ import com.stephenenright.typemapper.converter.TypeConverter;
 
 public class LongToLocalDateTimeTypeConverter implements TypeConverter<Long, LocalDateTime> {
 
+    public static final LongToLocalDateTimeTypeConverter INSTANCE = new LongToLocalDateTimeTypeConverter();
+
     @Override
     public LocalDateTime convert(TypeMappingContext<Long, LocalDateTime> context) {
         Long value = context.getSource();

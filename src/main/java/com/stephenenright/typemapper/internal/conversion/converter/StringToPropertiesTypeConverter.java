@@ -9,6 +9,8 @@ import com.stephenenright.typemapper.converter.TypeConverter;
 
 public class StringToPropertiesTypeConverter implements TypeConverter<String, Properties> {
 
+    public static final StringToPropertiesTypeConverter INSTANCE = new StringToPropertiesTypeConverter();
+
     @Override
     public Properties convert(TypeMappingContext<String, Properties> context) {
         String value = context.getSource();

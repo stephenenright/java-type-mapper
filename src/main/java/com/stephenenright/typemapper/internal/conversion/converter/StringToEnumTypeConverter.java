@@ -4,11 +4,14 @@ import com.stephenenright.typemapper.TypeMappingContext;
 import com.stephenenright.typemapper.converter.TypeConverter;
 import com.stephenenright.typemapper.internal.util.StringUtils;
 
-public class StringToEnumTypeConverter implements TypeConverter<String, Enum<?>> {
+@SuppressWarnings("rawtypes")
+public class StringToEnumTypeConverter implements TypeConverter<String, Enum> {
 
+    public static final StringToEnumTypeConverter INSTANCE = new StringToEnumTypeConverter();
+    
     @SuppressWarnings("unchecked")
     @Override
-    public Enum<?> convert(TypeMappingContext<String, Enum<?>> context) {
+    public Enum<?> convert(TypeMappingContext<String, Enum> context) {
         String value = context.getSource();
 
         if (StringUtils.isNullOrEmpty(value)) {

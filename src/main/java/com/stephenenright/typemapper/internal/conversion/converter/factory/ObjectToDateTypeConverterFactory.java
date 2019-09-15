@@ -12,6 +12,8 @@ import com.stephenenright.typemapper.internal.conversion.util.DateTypeConversion
 
 public class ObjectToDateTypeConverterFactory implements TypeConverterFactory<Object, Date> {
 
+    public static final ObjectToDateTypeConverterFactory INSTANCE = new ObjectToDateTypeConverterFactory();
+    
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Date> TypeConverter<Object, T> getTypeConverter(TypeMappingContext<?, ?> context) {

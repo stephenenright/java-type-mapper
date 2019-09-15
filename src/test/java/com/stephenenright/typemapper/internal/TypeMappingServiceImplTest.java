@@ -1,11 +1,12 @@
 package com.stephenenright.typemapper.internal;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import com.stephenenright.typemapper.test.dto.vending.VendingMachineDto;
-import com.stephenenright.typemapper.test.models.vending.VendingMachine;
+import com.stephenenright.typemapper.test.fixture.utils.FixtureUtils;
 
 public class TypeMappingServiceImplTest {
 
@@ -13,15 +14,14 @@ public class TypeMappingServiceImplTest {
 
     @Before
     public void setup() {
-        mappingService = new TypeMappingServiceImpl();
+        mappingService = FixtureUtils.createDefaultMappingService();
     }
 
     @Test
-    public void map() {
-        VendingMachine source = new VendingMachine();
-        VendingMachineDto result = mappingService.map(source, VendingMachineDto.class);
-
-        Assert.assertTrue(result.getClass().isAssignableFrom(VendingMachineDto.class));
+    public void map_IntegerToDouble() {
+        Double result = mappingService.map(Integer.valueOf(100), Double.class);
+        assertNotNull(result);
+        assertEquals(result, Double.valueOf(100));
 
     }
 }
