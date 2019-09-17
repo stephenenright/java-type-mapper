@@ -11,20 +11,20 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.stephenenright.typemapper.TypeIntrospectionStore;
+import com.stephenenright.typemapper.TypeIntrospector;
 import com.stephenenright.typemapper.configuration.TypeMapperConfiguration;
 import com.stephenenright.typemapper.test.models.vending.PaymentProcessor;
 import com.stephenenright.typemapper.test.models.vending.VendingMachine;
 import com.stephenenright.typemapper.test.models.vending.VendingMachineStatus;
 
-public class TypeInformationCreatorImplTest {
+public class TypeInfoCreatorImplTest {
 
-    private TypeInformationCreatorDefaultImpl creator;
+    private TypeInfoCreatorDefaultImpl creator;
 
     @Before
     public void setup() {
-        TypeIntrospectionStore introspector = new TypeIntrospectionStoreImpl();
-        creator = new TypeInformationCreatorDefaultImpl(new TypePropertyInfoCollectorImpl(introspector));
+        TypeIntrospector introspector = new TypeIntrospectorImpl();
+        creator = new TypeInfoCreatorDefaultImpl(new TypePropertyInfoCollectorImpl(introspector));
     }
 
     @Test
@@ -43,7 +43,7 @@ public class TypeInformationCreatorImplTest {
         expectedSetterMap.put("status", VendingMachineStatus.class);
 
         TypeMapperConfiguration configuration = TypeMapperConfiguration.create();
-        TypeInformation<VendingMachine> typeInfo = creator.create(VendingMachine.class, configuration);
+        TypeInfo<VendingMachine> typeInfo = creator.create(VendingMachine.class, configuration);
 
         assertNotNull(typeInfo);
         assertEquals(VendingMachine.class, typeInfo.getType());

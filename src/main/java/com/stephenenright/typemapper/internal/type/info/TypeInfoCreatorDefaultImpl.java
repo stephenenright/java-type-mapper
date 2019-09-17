@@ -5,22 +5,22 @@ import java.util.Map;
 import com.stephenenright.typemapper.configuration.TypeMapperConfiguration;
 import com.stephenenright.typemapper.internal.common.Pair;
 
-public class TypeInformationCreatorDefaultImpl implements TypeInformationCreator {
+public class TypeInfoCreatorDefaultImpl implements TypeInfoCreator {
 
     private TypePropertyInfoCollector propertyInfoCollector;
 
-    public TypeInformationCreatorDefaultImpl(TypePropertyInfoCollector propertyInfoCollector) {
+    public TypeInfoCreatorDefaultImpl(TypePropertyInfoCollector propertyInfoCollector) {
         this.propertyInfoCollector = propertyInfoCollector;
 
     }
 
     @Override
-    public <T> TypeInformation<T> create(Class<T> type, TypeMapperConfiguration configuration) {
+    public <T> TypeInfo<T> create(Class<T> type, TypeMapperConfiguration configuration) {
 
         Pair<Map<String, TypePropertyGetter>, Map<String, TypePropertySetter>> propertyPair = propertyInfoCollector
                 .collectProperties(type, configuration);
 
-        return new TypeInformationImpl<T>(type, configuration, propertyPair.getValue1(), propertyPair.getValue2());
+        return new TypeInfoImpl<T>(type, configuration, propertyPair.getValue1(), propertyPair.getValue2());
 
     }
 

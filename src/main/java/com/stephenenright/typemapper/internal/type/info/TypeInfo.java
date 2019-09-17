@@ -9,7 +9,7 @@ import com.stephenenright.typemapper.configuration.TypeMapperConfiguration;
  *
  * @param <T> the type that this object describes
  */
-public interface TypeInformation<T> {
+public interface TypeInfo<T> {
 
     /**
      * Returns the type of the object described

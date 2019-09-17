@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.stephenenright.typemapper.TypeIntrospectionStore;
+import com.stephenenright.typemapper.TypeIntrospector;
 import com.stephenenright.typemapper.configuration.TypeMapperConfiguration;
 import com.stephenenright.typemapper.internal.common.Pair;
 import com.stephenenright.typemapper.internal.util.JavaBeanUtils;
@@ -13,10 +13,10 @@ import com.stephenenright.typemapper.internal.util.MethodUtils;
 
 public class TypePropertyInfoCollectorImpl implements TypePropertyInfoCollector {
 
-    private final TypeIntrospectionStore introspectionStore;
+    private final TypeIntrospector introspector;
 
-    public TypePropertyInfoCollectorImpl(TypeIntrospectionStore introspectionStore) {
-        this.introspectionStore = introspectionStore;
+    public TypePropertyInfoCollectorImpl(TypeIntrospector introspector) {
+        this.introspector = introspector;
     }
 
     @Override
@@ -35,7 +35,7 @@ public class TypePropertyInfoCollectorImpl implements TypePropertyInfoCollector 
     private void collectMethods(Class<?> type, TypeMapperConfiguration configuration,
             Map<String, TypePropertyGetter> getterMap, Map<String, TypePropertySetter> setterMap) {
 
-        Method[] methods = introspectionStore.getDeclaredMethods(type);
+        Method[] methods = introspector.getDeclaredMethods(type);
 
         for (Method method : methods) {
 

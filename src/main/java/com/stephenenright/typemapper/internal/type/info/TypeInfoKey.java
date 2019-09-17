@@ -2,12 +2,12 @@ package com.stephenenright.typemapper.internal.type.info;
 
 import com.stephenenright.typemapper.configuration.TypeMapperConfiguration;
 
-class TypeInformationKey {
+class TypeInfoKey {
 
     private final Class<?> type;
     private final TypeMapperConfiguration configuration;
 
-    public TypeInformationKey(Class<?> type, TypeMapperConfiguration configuration) {
+    public TypeInfoKey(Class<?> type, TypeMapperConfiguration configuration) {
         this.type = type;
         this.configuration = configuration;
     }
@@ -26,11 +26,11 @@ class TypeInformationKey {
             return true;
         }
 
-        if (!(obj instanceof TypeInformation)) {
+        if (!(obj instanceof TypeInfo)) {
             return false;
         }
 
-        TypeInformation<?> typeInfo = (TypeInformation<?>) obj;
+        TypeInfo<?> typeInfo = (TypeInfo<?>) obj;
         return type.equals(typeInfo.getType()) && configuration.equals(typeInfo.getConfiguration());
     }
 

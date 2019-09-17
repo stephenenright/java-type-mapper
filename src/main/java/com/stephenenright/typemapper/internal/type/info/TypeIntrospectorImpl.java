@@ -6,10 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.stephenenright.typemapper.TypeIntrospectionStore;
+import com.stephenenright.typemapper.TypeIntrospector;
 import com.stephenenright.typemapper.internal.collection.ConcurrentReferenceHashMap;
 
-public class TypeIntrospectionStoreImpl implements TypeIntrospectionStore {
+public class TypeIntrospectorImpl implements TypeIntrospector {
 
     private static final Method[] EMPTY_METHOD_ARRAY = new Method[0];
 

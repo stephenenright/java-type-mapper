@@ -4,14 +4,14 @@ import java.util.Map;
 
 import com.stephenenright.typemapper.configuration.TypeMapperConfiguration;
 
-public class TypeInformationImpl<T> implements TypeInformation<T> {
+public class TypeInfoImpl<T> implements TypeInfo<T> {
     
     private final Class<T> type;
     private final TypeMapperConfiguration configuration;
     private final Map<String, TypePropertyGetter> propertyGetters;
     private final Map<String, TypePropertySetter> propertySetters;
 
-    public TypeInformationImpl(Class<T> type, TypeMapperConfiguration configuration, 
+    public TypeInfoImpl(Class<T> type, TypeMapperConfiguration configuration, 
             Map<String, TypePropertyGetter> propertyGetters, Map<String, TypePropertySetter> propertySetters) {
         this.type = type;
         this.configuration = configuration;

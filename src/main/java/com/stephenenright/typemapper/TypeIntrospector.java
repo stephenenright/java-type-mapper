@@ -2,7 +2,7 @@ package com.stephenenright.typemapper;
 
 import java.lang.reflect.Method;
 
-public interface TypeIntrospectionStore {
+public interface TypeIntrospector {
 
     public Method[] getDeclaredMethods(Class<?> clazz);
 

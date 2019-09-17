@@ -1,6 +1,6 @@
 package com.stephenenright.typemapper.configuration;
 
-import com.stephenenright.typemapper.TypeIntrospectionStore;
+import com.stephenenright.typemapper.TypeIntrospector;
 import com.stephenenright.typemapper.internal.configuration.TypeMapperConfigurationImpl;
 
 public interface TypeMapperConfiguration {
@@ -28,15 +28,15 @@ public interface TypeMapperConfiguration {
      * 
      * @return the introspection store
      */
-    public TypeIntrospectionStore getIntrospectionStore();
+    public TypeIntrospector getIntrospector();
 
     /**
-     * Allows the introspection store to be set. This is useful if you want to reuse
-     * a cache, for example if the spring framework is being used etc.
+     * Allows the introspector to be set. This is useful if you want to reuse
+     * an instrospector cache, for example if the spring framework is being used etc.
      * 
-     * @param store the store to set
+     * @param introspector the introspector to set
      */
-    public void setIntrospectionStore(TypeIntrospectionStore store);
+    public void setIntrospector(TypeIntrospector introspector);
 
     /**
      * Create a new configuration instance
