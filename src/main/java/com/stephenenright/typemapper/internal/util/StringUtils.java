@@ -43,4 +43,14 @@ public abstract class StringUtils {
         return timeZone;
     }
 
+    public static String uncapitalize(String str) {
+        if (isNullOrEmpty(str)) {
+            return str;
+        }
+
+        char chars[] = str.toCharArray();
+        chars[0] = Character.toLowerCase(chars[0]);
+        return String.valueOf(chars);
+
+    }
 }

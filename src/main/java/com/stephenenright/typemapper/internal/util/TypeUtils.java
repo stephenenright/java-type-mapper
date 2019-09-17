@@ -1,5 +1,7 @@
 package com.stephenenright.typemapper.internal.util;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
@@ -7,8 +9,16 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.stephenenright.typemapper.internal.collection.ConcurrentReferenceHashMap;
+import com.stephenenright.typemapper.internal.type.UnResolvableType;
 
 public abstract class TypeUtils {
+
+    private static final Map<Class<?>, Reference<Map<TypeVariable<?>, Type>>> typesCache = new ConcurrentReferenceHashMap<>(
+            256);
 
     private TypeUtils() {
 
@@ -102,4 +112,118 @@ public abstract class TypeUtils {
     public static String toString(Type type) {
         return type instanceof Class ? ((Class<?>) type).getName() : type.toString();
     }
+
+    public static Type resolveBound(TypeVariable<?> typeVariable) {
+        Type[] bounds = typeVariable.getBounds();
+        if (bounds.length == 0)
+            return UnResolvableType.class;
+
+        Type bound = bounds[0];
+        if (bound instanceof TypeVariable)
+            bound = resolveBound((TypeVariable<?>) bound);
+
+        return bound == Object.class ? UnResolvableType.class : bound;
+    }
+
+    private static void collectSuperTypeArgs(final Type[] types, final Map<TypeVariable<?>, Type> map) {
+        for (Type type : types) {
+            if (type instanceof ParameterizedType) {
+                ParameterizedType parameterizedType = (ParameterizedType) type;
+                Type rawType = parameterizedType.getRawType();
+                if (rawType instanceof Class) {
+                    collectSuperTypeArgs(((Class<?>) rawType).getGenericInterfaces(), map);
+                }
+            } else if (type instanceof Class) {
+                collectSuperTypeArgs(((Class<?>) type).getGenericInterfaces(), map);
+            }
+        }
+    }
+
+    private static void collectTypeArgs(ParameterizedType type, Map<TypeVariable<?>, Type> map) {
+        if (type.getRawType() instanceof Class) {
+            TypeVariable<?>[] typeVariables = ((Class<?>) type.getRawType()).getTypeParameters();
+            Type[] typeArguments = type.getActualTypeArguments();
+
+            if (type.getOwnerType() != null) {
+                Type owner = type.getOwnerType();
+                if (owner instanceof ParameterizedType) {
+                    collectTypeArgs((ParameterizedType) owner, map);
+                }
+            }
+
+            for (int i = 0; i < typeArguments.length; i++) {
+                TypeVariable<?> variable = typeVariables[i];
+                Type typeArgument = typeArguments[i];
+
+                if (typeArgument instanceof Class) {
+                    map.put(variable, typeArgument);
+                } else if (typeArgument instanceof GenericArrayType) {
+                    map.put(variable, typeArgument);
+                } else if (typeArgument instanceof ParameterizedType) {
+                    map.put(variable, typeArgument);
+                } else if (typeArgument instanceof TypeVariable) {
+                    TypeVariable<?> typeVariableArgument = (TypeVariable<?>) typeArgument;
+                    Type resolvedType = map.get(typeVariableArgument);
+                    if (resolvedType == null)
+                        resolvedType = resolveBound(typeVariableArgument);
+                    map.put(variable, resolvedType);
+                }
+            }
+        }
+    }
+
+    public static Class<?> resolveRawClass(Type genericType, Class<?> subType) {
+        if (genericType instanceof Class) {
+            return (Class<?>) genericType;
+        } else if (genericType instanceof ParameterizedType) {
+            return resolveRawClass(((ParameterizedType) genericType).getRawType(), subType);
+        } else if (genericType instanceof GenericArrayType) {
+            GenericArrayType arrayType = (GenericArrayType) genericType;
+            Class<?> component = resolveRawClass(arrayType.getGenericComponentType(), subType);
+            return Array.newInstance(component, 0).getClass();
+        } else if (genericType instanceof TypeVariable) {
+            TypeVariable<?> variable = (TypeVariable<?>) genericType;
+            genericType = getTypeVariableMap(subType).get(variable);
+            genericType = genericType == null ? TypeUtils.resolveBound(variable)
+                    : resolveRawClass(genericType, subType);
+        }
+
+        return genericType instanceof Class ? (Class<?>) genericType : UnResolvableType.class;
+    }
+
+    private static Map<TypeVariable<?>, Type> getTypeVariableMap(final Class<?> targetType) {
+        Reference<Map<TypeVariable<?>, Type>> ref = typesCache.get(targetType);
+        Map<TypeVariable<?>, Type> map = ref != null ? ref.get() : null;
+
+        if (map == null) {
+            map = new HashMap<TypeVariable<?>, Type>();
+
+            TypeUtils.collectSuperTypeArgs(targetType.getGenericInterfaces(), map);
+
+            Type genericType = targetType.getGenericSuperclass();
+            Class<?> type = targetType.getSuperclass();
+            while (type != null && !Object.class.equals(type)) {
+                if (genericType instanceof ParameterizedType)
+                    TypeUtils.collectTypeArgs((ParameterizedType) genericType, map);
+                TypeUtils.collectSuperTypeArgs(type.getGenericInterfaces(), map);
+
+                genericType = type.getGenericSuperclass();
+                type = type.getSuperclass();
+            }
+
+            type = targetType;
+            while (type.isMemberClass()) {
+                genericType = type.getGenericSuperclass();
+                if (genericType instanceof ParameterizedType)
+                    TypeUtils.collectTypeArgs((ParameterizedType) genericType, map);
+
+                type = type.getEnclosingClass();
+            }
+
+            typesCache.put(targetType, new WeakReference<Map<TypeVariable<?>, Type>>(map));
+        }
+
+        return map;
+    }
+
 }

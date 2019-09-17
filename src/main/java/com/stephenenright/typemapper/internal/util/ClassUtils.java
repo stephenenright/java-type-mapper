@@ -18,6 +18,7 @@ public abstract class ClassUtils {
         primitiveWrapperToPrimitiveTypeMap.put(Integer.class, int.class);
         primitiveWrapperToPrimitiveTypeMap.put(Long.class, long.class);
         primitiveWrapperToPrimitiveTypeMap.put(Short.class, short.class);
+        primitiveWrapperToPrimitiveTypeMap.put(Void.class, void.class);
 
         primitiveWrapperToPrimitiveTypeMap.forEach((key, value) -> {
             primitiveToWrapperTypeMap.put(value, key);
@@ -33,7 +34,7 @@ public abstract class ClassUtils {
     public static Class<?> resolvePrimitiveAsWrapperIfNessecary(Class<?> clazz) {
         AssertUtils.notNull(clazz, "Class is null");
         
-        if(!clazz.isPrimitive() || clazz == void.class) {
+        if(!clazz.isPrimitive()) {
             return clazz;
         }
         
