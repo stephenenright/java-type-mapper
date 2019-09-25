@@ -53,7 +53,6 @@ public class TypeMappingBuilderImplTest {
         }
 
         assertTrue("Not all expected mappings matched", expectedMappings.isEmpty());
-
     }
 
 }

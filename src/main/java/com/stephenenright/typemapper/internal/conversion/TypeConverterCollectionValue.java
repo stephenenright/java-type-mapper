@@ -4,16 +4,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.stephenenright.typemapper.converter.TypeConverter;
-import com.stephenenright.typemapper.converter.TypePredicateConverter;
+import com.stephenenright.typemapper.converter.TypeConditionalConverter;
 import com.stephenenright.typemapper.internal.util.CollectionUtils;
 
 class TypeConverterCollectionValue {
 
     private TypeConverter<?, ?> converter;
-    private List<TypePredicateConverter<?, ?>> predicateConverterList = new LinkedList<>();
+    private List<TypeConditionalConverter<?, ?>> predicateConverterList = new LinkedList<>();
 
     public TypeConverterCollectionValue(TypeConverter<?, ?> converter,
-            TypePredicateConverter<?, ?>... predicateConverters) {
+            TypeConditionalConverter<?, ?>... predicateConverters) {
         this.converter = converter;
         this.predicateConverterList = CollectionUtils.asLinkedList(predicateConverters);
     }
@@ -26,7 +26,7 @@ class TypeConverterCollectionValue {
         this.converter = converter;
     }
 
-    public void addPredicateConverter(TypePredicateConverter<?, ?> converter) {
+    public void addPredicateConverter(TypeConditionalConverter<?, ?> converter) {
         predicateConverterList.add(converter);
     }
 
@@ -35,11 +35,11 @@ class TypeConverterCollectionValue {
 
     }
 
-    public List<TypePredicateConverter<?, ?>> getPredicateConverterList() {
+    public List<TypeConditionalConverter<?, ?>> getPredicateConverterList() {
         return predicateConverterList;
     }
 
-    public void setPredicateConverterList(List<TypePredicateConverter<?, ?>> predicateConverterList) {
+    public void setPredicateConverterList(List<TypeConditionalConverter<?, ?>> predicateConverterList) {
         this.predicateConverterList = predicateConverterList;
     }
 }

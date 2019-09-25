@@ -1,9 +1,9 @@
 package com.stephenenright.typemapper.internal.conversion.converter;
 
 import com.stephenenright.typemapper.TypeMappingContext;
-import com.stephenenright.typemapper.converter.TypePredicateConverter;
+import com.stephenenright.typemapper.converter.TypeConditionalConverter;
 
-public class ObjectToObjectConverter implements TypePredicateConverter<Object, Object> {
+public class ObjectToObjectConverter implements TypeConditionalConverter<Object, Object> {
 
     public static ObjectToObjectConverter INSTANCE = new ObjectToObjectConverter();
 
@@ -13,7 +13,7 @@ public class ObjectToObjectConverter implements TypePredicateConverter<Object, O
     }
 
     @Override
-    public PredicateResult test(Class<?> sourceType, Class<?> destinationType) {
-        return destinationType.isAssignableFrom(sourceType) ? PredicateResult.FULL : PredicateResult.NONE;
+    public MatchResult test(Class<?> sourceType, Class<?> destinationType) {
+        return destinationType.isAssignableFrom(sourceType) ? MatchResult.FULL : MatchResult.NONE;
     }
 }

@@ -6,8 +6,8 @@ import java.util.Map.Entry;
 
 import com.stephenenright.typemapper.configuration.TypeMapperConfiguration;
 import com.stephenenright.typemapper.converter.TypeConverter;
-import com.stephenenright.typemapper.converter.TypePredicateConverter;
-import com.stephenenright.typemapper.converter.TypePredicateConverter.PredicateResult;
+import com.stephenenright.typemapper.converter.TypeConditionalConverter;
+import com.stephenenright.typemapper.converter.TypeConditionalConverter.MatchResult;
 import com.stephenenright.typemapper.internal.collection.Stack;
 import com.stephenenright.typemapper.internal.conversion.TypeConverterRegistry;
 import com.stephenenright.typemapper.internal.type.info.TypeInfo;
@@ -60,7 +60,6 @@ public class TypeMappingBuilderImpl implements TypeMappingBuilder {
         }
         
         context.sourceTypeInfoPop();
-  
     }
 
     private boolean matchSource(TypeInfo<?> sourceTypeInfo, String destinationPropertyName,
@@ -89,11 +88,11 @@ public class TypeMappingBuilderImpl implements TypeMappingBuilder {
                         destinationSetter.getType());
 
                 if (converter != null) {
-                    if (converter instanceof TypePredicateConverter<?, ?>) {
-                        PredicateResult matchResult = ((TypePredicateConverter<?, ?>) converter)
+                    if (converter instanceof TypeConditionalConverter<?, ?>) {
+                        MatchResult matchResult = ((TypeConditionalConverter<?, ?>) converter)
                                 .test(sourceGetter.getType(), destinationSetter.getType());
 
-                        if (matchResult != PredicateResult.NONE) {
+                        if (matchResult != MatchResult.NONE) {
                             // we have a viable mapping
                             context.addMapping(
                                     new TypeMappingImpl(context.getPropertyMappingPath().getSourceProperties(),
@@ -150,10 +149,6 @@ public class TypeMappingBuilderImpl implements TypeMappingBuilder {
 
         public PropertyMappingPath getPropertyMappingPath() {
             return propertyMappingPath;
-        }
-
-        public TypeInfo<?> getRootSourceTypeInfo() {
-            return rootSourceTypeInfo;
         }
 
         public TypeMapperConfiguration getConfiguration() {

@@ -7,8 +7,8 @@ import java.util.Map;
 
 import com.stephenenright.typemapper.converter.TypeConverter;
 import com.stephenenright.typemapper.converter.TypeConverterFactory;
-import com.stephenenright.typemapper.converter.TypePredicateConverter;
-import com.stephenenright.typemapper.converter.TypePredicateConverter.PredicateResult;
+import com.stephenenright.typemapper.converter.TypeConditionalConverter;
+import com.stephenenright.typemapper.converter.TypeConditionalConverter.MatchResult;
 import com.stephenenright.typemapper.internal.collection.ConcurrentReferenceHashMap;
 import com.stephenenright.typemapper.internal.conversion.TypeConverterAdapters.TypeConverterFactoryAdapter;
 import com.stephenenright.typemapper.internal.conversion.converter.NullableTypeConverter;
@@ -74,11 +74,11 @@ public class TypeConverterCollectionImpl implements TypeConverterCollection {
         TypeConverter<?, ?> foundConverter = null;
         // if we have predicate converters then lets try to match on them
         if (colValue.hasPredicateConverters()) {
-            for (TypePredicateConverter<?, ?> converter : colValue.getPredicateConverterList()) {
-                PredicateResult predicateResult = converter.test(sourceType, destinationType);
-                if (predicateResult == PredicateResult.FULL) {
+            for (TypeConditionalConverter<?, ?> converter : colValue.getPredicateConverterList()) {
+                MatchResult predicateResult = converter.test(sourceType, destinationType);
+                if (predicateResult == MatchResult.FULL) {
                     return converter;
-                } else if (foundConverter == null && predicateResult == PredicateResult.PARTIAL) {
+                } else if (foundConverter == null && predicateResult == MatchResult.PARTIAL) {
                     foundConverter = converter;
                 }
             }
@@ -109,8 +109,8 @@ public class TypeConverterCollectionImpl implements TypeConverterCollection {
             colValue = new TypeConverterCollectionValue(null);
         }
 
-        if (converter instanceof TypePredicateConverter) {
-            colValue.addPredicateConverter((TypePredicateConverter) converter);
+        if (converter instanceof TypeConditionalConverter) {
+            colValue.addPredicateConverter((TypeConditionalConverter) converter);
         } else {
             colValue.setConverter(converter);
         }
