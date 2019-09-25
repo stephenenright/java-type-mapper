@@ -32,7 +32,7 @@ class PropertyMappingPath {
         destinationPropertyPath.pop();
     }
 
-    public void sourcePathPush() {
+    public void sourcePathPop() {
         sourcePropertyPath.pop();
         sourceProperties.pop();
     }

@@ -8,7 +8,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
-
 public abstract class JavaBeanUtils {
 
     private JavaBeanUtils() {
@@ -72,6 +71,12 @@ public abstract class JavaBeanUtils {
         } else {
             throw new IllegalStateException("Method name is not a valid getter");
         }
+    }
+
+    public static boolean isPossibleJavaBean(Class<?> type) {
+        return type != Object.class && type != String.class && type != UUID.class && type != LocalDate.class
+                && type != LocalDateTime.class && type != ZonedDateTime.class && type != Date.class
+                && type != Calendar.class && !ClassUtils.isPrimitive(type) && !IterableUtils.isIterable(type);
     }
 
 }

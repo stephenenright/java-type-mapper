@@ -30,7 +30,10 @@ public class TypeMappingBuilderImplTest {
         expectedMappings.put("PaymentProcessor.id", "PaymentProcessorDto.id");
         expectedMappings.put("PaymentProcessor.name", "PaymentProcessorDto.name");
         expectedMappings.put("PaymentProcessor.deleted", "PaymentProcessorDto.deleted");
-
+        expectedMappings.put("PaymentProcessor.gateway.deleted","PaymentProcessorDto.gateway.deleted");
+        expectedMappings.put("PaymentProcessor.gateway.name","PaymentProcessorDto.gateway.name");
+        expectedMappings.put("PaymentProcessor.gateway.id","PaymentProcessorDto.gateway.id");
+        
         TypeMappingInfo<PaymentProcessor, PaymentProcessorDto> mappingInfo = FixtureUtils
                 .createDefaultTypeMappingInfo(PaymentProcessor.class, PaymentProcessorDto.class);
         PaymentProcessor sourceObject = new PaymentProcessor();

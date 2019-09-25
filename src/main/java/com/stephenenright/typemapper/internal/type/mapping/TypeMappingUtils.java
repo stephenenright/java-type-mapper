@@ -33,6 +33,8 @@ public abstract class TypeMappingUtils {
 
                 builder.append(pi.getName());
             }
+            
+            i++;
         }
 
         return builder.toString();
