@@ -25,4 +25,10 @@ class TypePropertyMethodGetterImpl extends TypePropertyInfoBase<Method> implemen
                     + member.getDeclaringClass().getName(), e);
         }
     }
+
+    @Override
+    public String toString() {
+        return member == null ? name : member.getDeclaringClass().getSimpleName() + "." + name;
+    }
+
 }

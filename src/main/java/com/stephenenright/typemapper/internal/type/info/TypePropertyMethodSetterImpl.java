@@ -24,7 +24,11 @@ class TypePropertyMethodSetterImpl extends TypePropertyInfoBase<Method> implemen
             throw new PropertySetterException("Error setting value using method: " + member.getName() + ", for type: "
                     + member.getDeclaringClass().getName(), e);
         }
-
     }
 
+    @Override
+    public String toString() {
+        return member == null ? name : member.getDeclaringClass().getSimpleName() + "." + name;
+    }
+    
 }

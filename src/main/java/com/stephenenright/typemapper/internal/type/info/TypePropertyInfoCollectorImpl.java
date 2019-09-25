@@ -38,8 +38,9 @@ public class TypePropertyInfoCollectorImpl implements TypePropertyInfoCollector 
         Method[] methods = introspector.getDeclaredMethods(type);
 
         for (Method method : methods) {
-
-            if (!MemberUtils.isMemberAccessAllowed(method, configuration.getAccessLevel()) || !isMethodValid(method)) {
+            boolean isAccessAllowed = MemberUtils.isMemberAccessAllowed(method, configuration.getAccessLevel());
+            
+            if (!isAccessAllowed) {
                 continue;
             }
 
@@ -54,10 +55,6 @@ public class TypePropertyInfoCollectorImpl implements TypePropertyInfoCollector 
                 MethodUtils.makeAccessible(method);
             }
         }
-    }
-
-    private boolean isMethodValid(Method method) {
-        return !method.isBridge();
     }
 
     private boolean isGetterMethod(Method method) {

@@ -10,6 +10,7 @@ import com.stephenenright.typemapper.internal.conversion.converter.LongToLocalDa
 import com.stephenenright.typemapper.internal.conversion.converter.LongToZonedDateTimeTypeConverter;
 import com.stephenenright.typemapper.internal.conversion.converter.NumberToCharacterTypeConverter;
 import com.stephenenright.typemapper.internal.conversion.converter.NumberToEnumTypeConverter;
+import com.stephenenright.typemapper.internal.conversion.converter.ObjectToObjectConverter;
 import com.stephenenright.typemapper.internal.conversion.converter.ObjectToStringTypeConverter;
 import com.stephenenright.typemapper.internal.conversion.converter.StringToBooleanTypeConverter;
 import com.stephenenright.typemapper.internal.conversion.converter.StringToCharacterTypeConverter;
@@ -61,6 +62,7 @@ public class TypeConverterCollectionDefaultImpl extends TypeConverterCollectionI
         add(ZonedDateTimeToStringTypeConverter.INSTANCE);
         add(ZonedDateTimeToZoneIdTypeConverter.INSTANCE);
         add(ZoneIdToTimeZoneTypeConverter.INSTANCE);
+        add(ObjectToObjectConverter.INSTANCE);
 
     }
 

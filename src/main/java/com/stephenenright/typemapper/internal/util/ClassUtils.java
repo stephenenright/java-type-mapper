@@ -24,20 +24,27 @@ public abstract class ClassUtils {
             primitiveToWrapperTypeMap.put(value, key);
         });
     }
-    
+
     private ClassUtils() {
-        
-        
+
     }
-    
-    
+
+    public static boolean isPrimitive(Class<?> clazz) {
+        return clazz.isPrimitive() || isPrimitiveWrapper(clazz);
+    }
+
+    public static boolean isPrimitiveWrapper(Class<?> clazz) {
+        return primitiveToWrapperTypeMap.containsKey(clazz);
+
+    }
+
     public static Class<?> resolvePrimitiveAsWrapperIfNessecary(Class<?> clazz) {
         AssertUtils.notNull(clazz, "Class is null");
-        
-        if(!clazz.isPrimitive()) {
+
+        if (!clazz.isPrimitive()) {
             return clazz;
         }
-        
+
         return primitiveToWrapperTypeMap.get(clazz);
     }
 
@@ -52,38 +59,36 @@ public abstract class ClassUtils {
             if (leftClass == resolvedPrimitive) {
                 return true;
             }
-        }
-        else {
+        } else {
             Class<?> resolvedWrapper = primitiveToWrapperTypeMap.get(rightClass);
             if (resolvedWrapper != null && leftClass.isAssignableFrom(resolvedWrapper)) {
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
     public static boolean isCollection(Class<?> clazz) {
-        if(clazz==null) {
+        if (clazz == null) {
             return false;
         }
-        
+
         return Collection.class.isAssignableFrom(clazz);
     }
-    
+
     public static boolean isArray(Class<?> clazz) {
-        if(clazz==null) {
+        if (clazz == null) {
             return false;
         }
         return clazz.isArray();
     }
-    
-    
+
     public static boolean isMap(Class<?> clazz) {
-        if(clazz==null) {
+        if (clazz == null) {
             return false;
         }
-        
+
         return Map.class.isAssignableFrom(clazz);
     }
 }

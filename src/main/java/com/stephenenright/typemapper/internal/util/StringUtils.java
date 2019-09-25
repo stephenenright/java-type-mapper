@@ -1,6 +1,9 @@
 package com.stephenenright.typemapper.internal.util;
 
+import java.util.List;
 import java.util.TimeZone;
+
+import com.stephenenright.typemapper.internal.common.CommonConstants;
 
 public abstract class StringUtils {
 
@@ -53,4 +56,47 @@ public abstract class StringUtils {
         return String.valueOf(chars);
 
     }
+
+    public static String joinStrings(String sep, String... strs) {
+        if (strs.length == 0) {
+            return CommonConstants.EMPTY_STRING;
+        }
+
+        StringBuilder builder = new StringBuilder();
+        for (String str : strs) {
+            if (isNullOrEmpty(str)) {
+                continue;
+            }
+
+            if (builder.length() > 0) {
+                builder.append(sep);
+            }
+
+            builder.append(str);
+        }
+
+        return builder.toString();
+    }
+
+    public static String joinStrings(String sep, List<String> strs) {
+        if (strs.size() == 0) {
+            return CommonConstants.EMPTY_STRING;
+        }
+
+        StringBuilder builder = new StringBuilder();
+        for (String str : strs) {
+            if (isNullOrEmpty(str)) {
+                continue;
+            }
+
+            if (builder.length() > 0) {
+                builder.append(sep);
+            }
+
+            builder.append(str);
+        }
+
+        return builder.toString();
+    }
+
 }

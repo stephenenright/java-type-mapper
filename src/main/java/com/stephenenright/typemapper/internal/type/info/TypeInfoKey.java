@@ -40,4 +40,8 @@ class TypeInfoKey {
         return 31 * result + configuration.hashCode();
     }
 
+    @Override
+    public String toString() {
+        return String.format("Type info for type: %s", type.getName());
+    }
 }

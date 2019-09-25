@@ -1,6 +1,13 @@
 package com.stephenenright.typemapper.internal.util;
 
 import java.lang.reflect.Method;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.UUID;
+
 
 public abstract class JavaBeanUtils {
 
@@ -66,4 +73,5 @@ public abstract class JavaBeanUtils {
             throw new IllegalStateException("Method name is not a valid getter");
         }
     }
+
 }

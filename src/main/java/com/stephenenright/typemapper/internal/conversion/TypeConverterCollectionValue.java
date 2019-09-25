@@ -1,11 +1,11 @@
 package com.stephenenright.typemapper.internal.conversion;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.stephenenright.typemapper.converter.TypeConverter;
 import com.stephenenright.typemapper.converter.TypePredicateConverter;
+import com.stephenenright.typemapper.internal.util.CollectionUtils;
 
 class TypeConverterCollectionValue {
 
@@ -15,7 +15,7 @@ class TypeConverterCollectionValue {
     public TypeConverterCollectionValue(TypeConverter<?, ?> converter,
             TypePredicateConverter<?, ?>... predicateConverters) {
         this.converter = converter;
-        this.predicateConverterList = Arrays.asList(predicateConverters);
+        this.predicateConverterList = CollectionUtils.asLinkedList(predicateConverters);
     }
 
     public TypeConverter<?, ?> getConverter() {
