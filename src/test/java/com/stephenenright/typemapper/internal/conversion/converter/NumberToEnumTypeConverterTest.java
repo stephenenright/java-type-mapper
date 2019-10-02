@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import com.stephenenright.typemapper.TypeMappingContext;
-import com.stephenenright.typemapper.internal.TypeMappingContextImpl;
 import com.stephenenright.typemapper.internal.util.TypeUtils;
 import com.stephenenright.typemapper.test.fixture.utils.FixtureUtils;
 import com.stephenenright.typemapper.test.models.vending.VendingMachineStatus;
@@ -17,10 +16,8 @@ public class NumberToEnumTypeConverterTest {
     @Test
     public void convert_double() {
 
-        TypeMappingContext<Number, Enum> context = new TypeMappingContextImpl<Number, Enum>(1.0d,
-                (Class<Enum>) TypeUtils.getEnumType(VendingMachineStatus.class), 
-                FixtureUtils.createDefaultMappingService());
-
+        TypeMappingContext<Number, Enum> context = FixtureUtils.createMappingContext(1.0d,
+                (Class<Enum>) TypeUtils.getEnumType(VendingMachineStatus.class));
         Enum<?> enumResult = NumberToEnumTypeConverter.INSTANCE.convert(context);
         assertTrue(enumResult instanceof VendingMachineStatus);
         assertEquals(enumResult, VendingMachineStatus.ONLINE);

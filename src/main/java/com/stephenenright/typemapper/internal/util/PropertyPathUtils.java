@@ -13,5 +13,15 @@ public abstract class PropertyPathUtils {
     public static String joinPaths(List<String> properties) {
         return StringUtils.joinStrings(CommonConstants.PROPERTY_PATH_SEPERATOR, properties);
     }
-
+    
+    
+    
+    public static void addPropertyPath(StringBuilder builder, String path) {
+        if(builder.length() > 0) {
+            builder.append(CommonConstants.PROPERTY_PATH_SEPERATOR);
+        }
+        
+        builder.append(path);
+    }
+    
 }

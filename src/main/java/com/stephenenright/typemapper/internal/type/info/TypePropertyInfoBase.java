@@ -7,11 +7,13 @@ import com.stephenenright.typemapper.internal.util.TypeUtils;
 
 abstract class TypePropertyInfoBase<M extends Member> implements TypePropertyInfo {
 
+    protected Class<?> typeInDeclaringClass;
     protected String name;
     protected Class<?> type;
     protected final M member;
 
     public TypePropertyInfoBase(String name, Class<?> type, M member) {
+        this.typeInDeclaringClass = type;
         this.name = name;
         this.member = member;
         this.type = resolveType(type);
@@ -23,6 +25,12 @@ abstract class TypePropertyInfoBase<M extends Member> implements TypePropertyInf
 
     public Class<?> getType() {
         return type;
+    }
+    
+    
+    @Override
+    public Class<?> getTypeInDeclaringClass() {
+       return typeInDeclaringClass;
     }
 
     private Class<?> resolveType(Class<?> type) {

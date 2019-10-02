@@ -1,8 +1,9 @@
 package com.stephenenright.typemapper.internal.util;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 
 public abstract class ReflectionUtils {
 
@@ -31,9 +32,16 @@ public abstract class ReflectionUtils {
         if (!(genericType instanceof ParameterizedType)) {
             throw new RuntimeException("Missing type parameter. Type is: " + genericType);
         }
-        
+
         ParameterizedType parameterized = (ParameterizedType) genericType;
         return parameterized.getActualTypeArguments();
+    }
+
+    public static void makeAccessible(Constructor<?> constructor) {
+        if ((!Modifier.isPublic(constructor.getModifiers())
+                || !Modifier.isPublic(constructor.getDeclaringClass().getModifiers())) && !constructor.isAccessible()) {
+            constructor.setAccessible(true);
+        }
     }
 
 }

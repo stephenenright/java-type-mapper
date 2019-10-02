@@ -17,6 +17,8 @@ public interface TypePropertyInfo {
      * @return the type
      */
     public Class<?> getType();
+    
+    public Class<?> getTypeInDeclaringClass();
 
     /**
      * Returns the generic type of the property
@@ -24,5 +26,8 @@ public interface TypePropertyInfo {
      * @return the property generic type
      */
     public Type getGenericType();
+    
+    
+    
 
 }

@@ -3,26 +3,38 @@ package com.stephenenright.typemapper.test.fixture.utils;
 import java.util.Arrays;
 
 import com.stephenenright.typemapper.configuration.TypeMapperConfiguration;
+import com.stephenenright.typemapper.internal.TypeMappingContextImpl;
 import com.stephenenright.typemapper.internal.TypeMappingServiceImpl;
 import com.stephenenright.typemapper.internal.conversion.TypeConverterCollectionDefaultImpl;
 import com.stephenenright.typemapper.internal.conversion.TypeConverterRegistry;
 import com.stephenenright.typemapper.internal.conversion.TypeConverterRegistryImpl;
 import com.stephenenright.typemapper.internal.type.info.TypeInfoCreatorDefaultImpl;
+import com.stephenenright.typemapper.internal.type.info.TypeInfoRegistry;
 import com.stephenenright.typemapper.internal.type.info.TypeInfoRegistryImpl;
 import com.stephenenright.typemapper.internal.type.info.TypeIntrospectorImpl;
 import com.stephenenright.typemapper.internal.type.info.TypePropertyInfoCollectorImpl;
+import com.stephenenright.typemapper.internal.type.info.TypePropertyInfoRegistryImpl;
+import com.stephenenright.typemapper.internal.type.mapping.TypeMappingBuilderImpl;
 import com.stephenenright.typemapper.internal.type.mapping.TypeMappingInfo;
 import com.stephenenright.typemapper.internal.type.mapping.TypeMappingInfoImpl;
 import com.stephenenright.typemapper.internal.type.mapping.TypeMappingInfoRegistryImpl;
 
 public abstract class FixtureUtils {
 
+    public static <S, D> TypeMappingContextImpl<S, D> createMappingContext(S source, Class<D> destinationType) {
+        return new TypeMappingContextImpl<S, D>(TypeMapperConfiguration.create(), source, destinationType,
+                FixtureUtils.createDefaultMappingService());
+    }
+
     public static TypeMappingServiceImpl createDefaultMappingService() {
         return createMappingService(createDefaultConverterRegistry());
     }
 
     public static TypeMappingServiceImpl createMappingService(TypeConverterRegistry... converterRegistries) {
-        return new TypeMappingServiceImpl(Arrays.asList(converterRegistries));
+        TypeInfoRegistry typeInfoRegistry = createTypeInfoRegistry();
+        
+        return new TypeMappingServiceImpl(Arrays.asList(converterRegistries), createTypeMappingInfoRegistry(typeInfoRegistry),
+                typeInfoRegistry,createPropertyInfoRegistry(typeInfoRegistry));
     }
 
     public static TypeConverterRegistryImpl createDefaultConverterRegistry() {
@@ -34,17 +46,21 @@ public abstract class FixtureUtils {
                 new TypeInfoCreatorDefaultImpl(new TypePropertyInfoCollectorImpl(new TypeIntrospectorImpl())));
     }
 
-    public static TypeMappingInfoRegistryImpl createTypeMappingInfoRegistry() {
-        return new TypeMappingInfoRegistryImpl();
+    public static TypePropertyInfoRegistryImpl createPropertyInfoRegistry(TypeInfoRegistry infoRegistry) {
+        return new TypePropertyInfoRegistryImpl(infoRegistry);
     }
 
-    public static <S, D> TypeMappingInfo<S, D> createDefaultTypeMappingInfo(Class<S> sourceType, Class<D> destinationType) {
+    public static TypeMappingInfoRegistryImpl createTypeMappingInfoRegistry(TypeInfoRegistry typeInfoRegistry) {
+        return new TypeMappingInfoRegistryImpl(
+                new TypeMappingBuilderImpl(typeInfoRegistry, createDefaultConverterRegistry()));
+    }
+
+    public static <S, D> TypeMappingInfo<S, D> createDefaultTypeMappingInfo(Class<S> sourceType,
+            Class<D> destinationType) {
         TypeMapperConfiguration configuration = TypeMapperConfiguration.create();
         TypeMappingInfoImpl<S, D> mappingInfo = new TypeMappingInfoImpl<S, D>(sourceType, destinationType,
                 configuration);
 
         return mappingInfo;
-
     }
-
 }

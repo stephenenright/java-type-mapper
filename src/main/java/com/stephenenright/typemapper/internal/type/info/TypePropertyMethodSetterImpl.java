@@ -15,7 +15,8 @@ class TypePropertyMethodSetterImpl extends TypePropertyInfoBase<Method> implemen
     public Type getGenericType() {
         return member.getGenericParameterTypes()[0];
     }
-
+    
+ 
     @Override
     public void setValue(Object target, Object value) {
         try {

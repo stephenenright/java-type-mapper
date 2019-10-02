@@ -19,26 +19,23 @@ import com.stephenenright.typemapper.internal.util.JavaBeanUtils;
 public class TypeMappingBuilderImpl implements TypeMappingBuilder {
 
     private final TypeInfoRegistry typeInfoRegistry;
-    private final TypeMappingInfoRegistry typeMappingInfoRegistry;
     private final TypeConverterRegistry typeConverterRegistry;
 
-    public TypeMappingBuilderImpl(TypeInfoRegistry typeInfoRegistry, TypeMappingInfoRegistry typeMappingInfoRegistry,
-            TypeConverterRegistry typeConverterRegistry) {
+    public TypeMappingBuilderImpl(TypeInfoRegistry typeInfoRegistry, TypeConverterRegistry typeConverterRegistry) {
         this.typeInfoRegistry = typeInfoRegistry;
-        this.typeMappingInfoRegistry = typeMappingInfoRegistry;
         this.typeConverterRegistry = typeConverterRegistry;
     }
 
     @Override
     public <S, D> void buildMappings(S source, TypeMappingInfo<S, D> typeMappingInfo,
-            TypeMapperConfiguration configuration) {
+            TypeMapperConfiguration configuration, TypeMappingInfoRegistry typeMappingInfoRegistry) {
 
         PropertyMappingPath mappingPath = new PropertyMappingPath();
         final TypeInfo<S> sourceTypeInfo = typeInfoRegistry.get(typeMappingInfo.getSourceType(), configuration);
 
         TypeMappingBuilderContext<?, ?> context = new TypeMappingBuilderContext<S, D>(typeMappingInfo, mappingPath,
-                sourceTypeInfo, configuration);
-        
+                sourceTypeInfo, configuration, typeMappingInfoRegistry);
+
         context.sourceTypeInfoPush(sourceTypeInfo);
         mapDestination(typeInfoRegistry.get(typeMappingInfo.getDestinationType(), configuration), context);
     }
@@ -46,8 +43,9 @@ public class TypeMappingBuilderImpl implements TypeMappingBuilder {
     private void mapDestination(TypeInfo<?> destinationTypeInfo, TypeMappingBuilderContext<?, ?> context) {
         for (Entry<String, TypePropertySetter> entry : destinationTypeInfo.getPropertySetters().entrySet()) {
             context.getPropertyMappingPath().destinationPathPush(entry.getKey(), entry.getValue());
-            
-            boolean matched = matchSource(context.getSourceTypeInfoCurrent(), entry.getKey(), entry.getValue(),context);
+
+            boolean matched = matchSource(context.getSourceTypeInfoCurrent(), entry.getKey(), entry.getValue(),
+                    context);
 
             if (matched && !context.getMappings().isEmpty()) {
                 if (context.getMappings().size() > 1) {
@@ -58,7 +56,7 @@ public class TypeMappingBuilderImpl implements TypeMappingBuilder {
                 context.resetAfterMatch();
             }
         }
-        
+
         context.sourceTypeInfoPop();
     }
 
@@ -71,7 +69,7 @@ public class TypeMappingBuilderImpl implements TypeMappingBuilder {
         if (sourceGetter != null) { // matched destination setter
             context.getPropertyMappingPath().sourcePathPush(destinationPropertyName, sourceGetter);
 
-            TypeMappingInfo<?, ?> mappingInfo = typeMappingInfoRegistry.get(sourceGetter.getType(),
+            TypeMappingInfo<?, ?> mappingInfo = context.getMappingInfoRegistry().get(sourceGetter.getType(),
                     destinationSetter.getType());
 
             if (mappingInfo != null) {
@@ -90,7 +88,7 @@ public class TypeMappingBuilderImpl implements TypeMappingBuilder {
                 if (converter != null) {
                     if (converter instanceof TypeConditionalConverter<?, ?>) {
                         MatchResult matchResult = ((TypeConditionalConverter<?, ?>) converter)
-                                .test(sourceGetter.getType(), destinationSetter.getType());
+                                .matches(sourceGetter.getType(), destinationSetter.getType());
 
                         if (matchResult != MatchResult.NONE) {
                             // we have a viable mapping
@@ -108,14 +106,15 @@ public class TypeMappingBuilderImpl implements TypeMappingBuilder {
                 }
 
             }
-            
-            if(!matched) {
-                if(JavaBeanUtils.isPossibleJavaBean(sourceGetter.getType())) {
-                    context.sourceTypeInfoPush(typeInfoRegistry.get(sourceGetter.getType(), context.getConfiguration()));
-                    TypeInfo<?> destinationTypeInfo = typeInfoRegistry.get(destinationSetter.getType(), 
+
+            if (!matched) {
+                if (JavaBeanUtils.isPossibleJavaBean(sourceGetter.getType())) {
+                    context.sourceTypeInfoPush(
+                            typeInfoRegistry.get(sourceGetter.getType(), context.getConfiguration()));
+                    TypeInfo<?> destinationTypeInfo = typeInfoRegistry.get(destinationSetter.getType(),
                             context.getConfiguration());
-                    mapDestination(destinationTypeInfo, context);  
-                } 
+                    mapDestination(destinationTypeInfo, context);
+                }
             }
         }
 
@@ -132,14 +131,17 @@ public class TypeMappingBuilderImpl implements TypeMappingBuilder {
         private final TypeMapperConfiguration configuration;
         private final List<TypeMapping> mappings = new LinkedList<>();
         private Stack<TypeInfo<?>> sourceTypeInfoStack = new Stack<>();
+        private final TypeMappingInfoRegistry typeMappingInfoRegistry;
 
         public TypeMappingBuilderContext(TypeMappingInfo<S, D> typeMappingInfo, PropertyMappingPath propertyMappingPath,
-                TypeInfo<?> rootSourceTypeInfo, TypeMapperConfiguration configuration) {
+                TypeInfo<?> rootSourceTypeInfo, TypeMapperConfiguration configuration,
+                TypeMappingInfoRegistry typeMappingInfoRegistry) {
             this.typeMappingInfo = typeMappingInfo;
             this.propertyMappingPath = propertyMappingPath;
             this.rootSourceTypeInfo = rootSourceTypeInfo;
             this.configuration = configuration;
             sourceTypeInfoStack.push(rootSourceTypeInfo);
+            this.typeMappingInfoRegistry = typeMappingInfoRegistry;
 
         }
 
@@ -166,17 +168,17 @@ public class TypeMappingBuilderImpl implements TypeMappingBuilder {
         }
 
         public TypeInfo<?> getSourceTypeInfoCurrent() {
-            if(sourceTypeInfoStack.isEmpty()) {
+            if (sourceTypeInfoStack.isEmpty()) {
                 return rootSourceTypeInfo;
             }
-            
+
             return sourceTypeInfoStack.peek();
         }
-        
+
         public void sourceTypeInfoPop() {
             sourceTypeInfoStack.pop();
         }
-        
+
         public void sourceTypeInfoPush(TypeInfo<?> typeInfo) {
             sourceTypeInfoStack.push(typeInfo);
         }
@@ -189,6 +191,10 @@ public class TypeMappingBuilderImpl implements TypeMappingBuilder {
             mappings.clear();
             propertyMappingPath.sourcePathPop();
             propertyMappingPath.destinationPathPop();
+        }
+
+        public TypeMappingInfoRegistry getMappingInfoRegistry() {
+            return typeMappingInfoRegistry;
         }
     }
 }

@@ -17,11 +17,13 @@ import com.stephenenright.typemapper.test.models.vending.PaymentProcessor;
 public class TypeMappingBuilderImplTest {
 
     private TypeMappingBuilder builder;
+    private TypeMappingInfoRegistry mappingInfoRegistry;
 
     @Before
     public void setup() {
         builder = new TypeMappingBuilderImpl(FixtureUtils.createTypeInfoRegistry(),
-                FixtureUtils.createTypeMappingInfoRegistry(), FixtureUtils.createDefaultConverterRegistry());
+                FixtureUtils.createDefaultConverterRegistry());
+        mappingInfoRegistry = FixtureUtils.createTypeMappingInfoRegistry(FixtureUtils.createTypeInfoRegistry());
     }
 
     @Test
@@ -30,14 +32,14 @@ public class TypeMappingBuilderImplTest {
         expectedMappings.put("PaymentProcessor.id", "PaymentProcessorDto.id");
         expectedMappings.put("PaymentProcessor.name", "PaymentProcessorDto.name");
         expectedMappings.put("PaymentProcessor.deleted", "PaymentProcessorDto.deleted");
-        expectedMappings.put("PaymentProcessor.gateway.deleted","PaymentProcessorDto.gateway.deleted");
-        expectedMappings.put("PaymentProcessor.gateway.name","PaymentProcessorDto.gateway.name");
-        expectedMappings.put("PaymentProcessor.gateway.id","PaymentProcessorDto.gateway.id");
-        
+        expectedMappings.put("PaymentProcessor.gateway.deleted", "PaymentProcessorDto.gateway.deleted");
+        expectedMappings.put("PaymentProcessor.gateway.name", "PaymentProcessorDto.gateway.name");
+        expectedMappings.put("PaymentProcessor.gateway.id", "PaymentProcessorDto.gateway.id");
+
         TypeMappingInfo<PaymentProcessor, PaymentProcessorDto> mappingInfo = FixtureUtils
                 .createDefaultTypeMappingInfo(PaymentProcessor.class, PaymentProcessorDto.class);
         PaymentProcessor sourceObject = new PaymentProcessor();
-        builder.buildMappings(sourceObject, mappingInfo, mappingInfo.getConfiguration());
+        builder.buildMappings(sourceObject, mappingInfo, mappingInfo.getConfiguration(), mappingInfoRegistry);
 
         List<TypeMapping> mappingsList = mappingInfo.getTypeMappings();
 

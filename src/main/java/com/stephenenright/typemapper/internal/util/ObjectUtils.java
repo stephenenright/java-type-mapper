@@ -1,6 +1,10 @@
+
 package com.stephenenright.typemapper.internal.util;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.function.Supplier;
 
 public abstract class ObjectUtils {
 
@@ -229,6 +233,29 @@ public abstract class ObjectUtils {
         }
 
         return Double.hashCode(d);
+    }
+
+    public static <T> T newInstance(Class<T> cls) throws NoSuchMethodException, InstantiationException,
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        Constructor<T> constructor = cls.getDeclaredConstructor();
+        ReflectionUtils.makeAccessible(constructor);
+        return constructor.newInstance();
+    }
+
+    public static <T> T newInstance(Constructor<T> constructor, Object... constructorArgs)
+            throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        ReflectionUtils.makeAccessible(constructor);
+        return constructor.newInstance(constructorArgs);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T firstNotNull(Supplier<T>... suppliers) {
+        for (Supplier<T> supplier : suppliers) {
+            T obj = supplier.get();
+            if (obj != null)
+                return obj;
+        }
+        return null;
     }
 
 }

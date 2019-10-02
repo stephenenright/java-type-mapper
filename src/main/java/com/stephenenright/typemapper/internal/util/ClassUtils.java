@@ -1,6 +1,7 @@
 package com.stephenenright.typemapper.internal.util;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
@@ -8,6 +9,7 @@ public abstract class ClassUtils {
 
     private static final Map<Class<?>, Class<?>> primitiveWrapperToPrimitiveTypeMap = new IdentityHashMap<>(8);
     private static final Map<Class<?>, Class<?>> primitiveToWrapperTypeMap = new IdentityHashMap<>(8);
+    private static final Map<Class<?>, Object> defaultValue;
 
     static {
         primitiveWrapperToPrimitiveTypeMap.put(Boolean.class, boolean.class);
@@ -23,6 +25,17 @@ public abstract class ClassUtils {
         primitiveWrapperToPrimitiveTypeMap.forEach((key, value) -> {
             primitiveToWrapperTypeMap.put(value, key);
         });
+
+        defaultValue = new HashMap<Class<?>, Object>();
+        defaultValue.put(Boolean.TYPE, Boolean.FALSE);
+        defaultValue.put(Byte.TYPE, Byte.valueOf((byte) 0));
+        defaultValue.put(Short.TYPE, Short.valueOf((short) 0));
+        defaultValue.put(Integer.TYPE, Integer.valueOf(0));
+        defaultValue.put(Long.TYPE, Long.valueOf(0L));
+        defaultValue.put(Float.TYPE, Float.valueOf(0.0f));
+        defaultValue.put(Double.TYPE, Double.valueOf(0.0d));
+        defaultValue.put(Character.TYPE, Character.valueOf('\u0000'));
+
     }
 
     private ClassUtils() {
@@ -31,6 +44,17 @@ public abstract class ClassUtils {
 
     public static boolean isPrimitive(Class<?> clazz) {
         return clazz.isPrimitive() || isPrimitiveWrapper(clazz);
+    }
+
+    public static boolean isNotPrimitive(Class<?>... classes) {
+        for (Class<?> clazz : classes) {
+            if (isPrimitive(clazz)) {
+                return false;
+            }
+        }
+
+        return true;
+
     }
 
     public static boolean isPrimitiveWrapper(Class<?> clazz) {
@@ -46,6 +70,11 @@ public abstract class ClassUtils {
         }
 
         return primitiveToWrapperTypeMap.get(clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T getPrimitiveDefaultValue(Class<?> type) {
+        return type.isPrimitive() ? (T) defaultValue.get(type) : null;
     }
 
     public static boolean isAssignable(Class<?> leftClass, Class<?> rightClass) {

@@ -2,17 +2,32 @@ package com.stephenenright.typemapper;
 
 import java.lang.reflect.Type;
 
+import com.stephenenright.typemapper.configuration.TypeMapperConfiguration;
+import com.stephenenright.typemapper.internal.TypeMappingService;
+import com.stephenenright.typemapper.internal.type.mapping.TypeMapping;
+
 public interface TypeMappingContext<S, D> {
 
-    S getSource();
+    public S getSource();
 
-    Class<S> getSourceType();
-    
-    D getDestination();
+    public Class<S> getSourceType();
 
-    Class<D> getDestinationType();
-    
-    Type getGenericDestinationType();
+    public D getDestination();
 
-    
+    public Class<D> getDestinationType();
+
+    public Type getGenericDestinationType();
+
+    public boolean hasDestination();
+
+    public TypeMapping getMapping();
+
+    public TypeMappingService getMappingService();
+
+    public <CS, CD> TypeMappingContext<CS, CD> createChild(CS source, Class<CD> destinationType);
+
+    public <CS, CD> TypeMappingContext<CS, CD> createChild(CS source, CD destination);
+
+    public TypeMapperConfiguration getConfiguration();
+
 }

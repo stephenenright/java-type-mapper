@@ -13,7 +13,7 @@ public class ObjectToObjectConverter implements TypeConditionalConverter<Object,
     }
 
     @Override
-    public MatchResult test(Class<?> sourceType, Class<?> destinationType) {
+    public MatchResult matches(Class<?> sourceType, Class<?> destinationType) {
         return destinationType.isAssignableFrom(sourceType) ? MatchResult.FULL : MatchResult.NONE;
     }
 }

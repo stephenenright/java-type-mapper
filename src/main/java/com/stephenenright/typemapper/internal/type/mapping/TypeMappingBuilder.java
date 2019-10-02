@@ -5,5 +5,5 @@ import com.stephenenright.typemapper.configuration.TypeMapperConfiguration;
 public interface TypeMappingBuilder {
 
     public <S, D> void buildMappings(S source, TypeMappingInfo<S, D> typeMappingInfo,
-            TypeMapperConfiguration configuration);
+            TypeMapperConfiguration configuration, TypeMappingInfoRegistry typeMappingInfoRegistry);
 }

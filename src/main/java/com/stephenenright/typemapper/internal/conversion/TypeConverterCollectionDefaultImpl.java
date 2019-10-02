@@ -1,5 +1,9 @@
 package com.stephenenright.typemapper.internal.conversion;
 
+import com.stephenenright.typemapper.internal.conversion.converter.ArrayToArrayTypeConverter;
+import com.stephenenright.typemapper.internal.conversion.converter.ArrayToCollectionTypeConverter;
+import com.stephenenright.typemapper.internal.conversion.converter.CollectionToArrayTypeConverter;
+import com.stephenenright.typemapper.internal.conversion.converter.CollectionToCollectionTypeConverter;
 import com.stephenenright.typemapper.internal.conversion.converter.EnumToStringTypeConverter;
 import com.stephenenright.typemapper.internal.conversion.converter.LocalDateTimeToLongTypeConverter;
 import com.stephenenright.typemapper.internal.conversion.converter.LocalDateTimeToStringTypeConverter;
@@ -39,6 +43,10 @@ public class TypeConverterCollectionDefaultImpl extends TypeConverterCollectionI
     }
 
     private void addDefaultConverters() {
+        add(ArrayToArrayTypeConverter.INSTANCE);
+        add(ArrayToCollectionTypeConverter.INSTANCE);
+        add(CollectionToArrayTypeConverter.INSTANCE);
+        add(CollectionToCollectionTypeConverter.INSTANCE);
         add(EnumToStringTypeConverter.INSTANCE);
         add(LocalDateTimeToLongTypeConverter.INSTANCE);
         add(LocalDateTimeToStringTypeConverter.INSTANCE);
@@ -63,7 +71,6 @@ public class TypeConverterCollectionDefaultImpl extends TypeConverterCollectionI
         add(ZonedDateTimeToZoneIdTypeConverter.INSTANCE);
         add(ZoneIdToTimeZoneTypeConverter.INSTANCE);
         add(ObjectToObjectConverter.INSTANCE);
-
     }
 
     private void addDefaultConverterFactories() {

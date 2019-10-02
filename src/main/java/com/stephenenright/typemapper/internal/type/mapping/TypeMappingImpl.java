@@ -1,11 +1,13 @@
 package com.stephenenright.typemapper.internal.type.mapping;
 
+import java.lang.reflect.Type;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.stephenenright.typemapper.converter.TypeConverter;
 import com.stephenenright.typemapper.internal.type.info.TypePropertyGetter;
 import com.stephenenright.typemapper.internal.type.info.TypePropertySetter;
+import com.stephenenright.typemapper.internal.util.ListUtils;
 
 public class TypeMappingImpl implements TypeMapping {
 
@@ -47,11 +49,11 @@ public class TypeMappingImpl implements TypeMapping {
         return destinationSetters;
     }
 
+    @Override
     public TypeConverter<?, ?> getConverter() {
         return converter;
     }
-    
-    
+
     @Override
     public String getSourcePath() {
         return TypeMappingUtils.mappingPropertiesToString(sourceGetters);
@@ -62,6 +64,23 @@ public class TypeMappingImpl implements TypeMapping {
         return TypeMappingUtils.mappingPropertiesToString(destinationSetters);
     }
 
+    @Override
+    public Class<?> getSourceType() {
+        return ListUtils.getLastElement(sourceGetters).getType();
+    }
+    
+    
+    @Override
+    public Class<?> getDesintationType() {
+        return ListUtils.getLastElement(destinationSetters).getType();
+
+    }
+  
+    @Override
+    public Type getDesintationGenericType() {
+        return ListUtils.getLastElement(destinationSetters).getGenericType();
+    }
+    
     @Override
     public String toString() {
         return TypeMappingUtils.mappingToString(this);

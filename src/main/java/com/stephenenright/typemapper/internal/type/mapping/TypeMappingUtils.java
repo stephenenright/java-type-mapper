@@ -39,5 +39,5 @@ public abstract class TypeMappingUtils {
 
         return builder.toString();
     }
-
+    
 }

@@ -75,7 +75,7 @@ public class TypeConverterCollectionImpl implements TypeConverterCollection {
         // if we have predicate converters then lets try to match on them
         if (colValue.hasPredicateConverters()) {
             for (TypeConditionalConverter<?, ?> converter : colValue.getPredicateConverterList()) {
-                MatchResult predicateResult = converter.test(sourceType, destinationType);
+                MatchResult predicateResult = converter.matches(sourceType, destinationType);
                 if (predicateResult == MatchResult.FULL) {
                     return converter;
                 } else if (foundConverter == null && predicateResult == MatchResult.PARTIAL) {

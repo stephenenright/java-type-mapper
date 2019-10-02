@@ -191,6 +191,26 @@ public abstract class TypeUtils {
         return genericType instanceof Class ? (Class<?>) genericType : UnResolvableType.class;
     }
 
+    public static <T, S extends T> Class<?> resolveRawArgument(Class<T> type, Class<S> subType) {
+        return resolveRawArgument(resolveGenericType(type, subType), subType);
+    }
+
+    public static Class<?> resolveRawArgument(Type genericType, Class<?> subType) {
+        Class<?>[] arguments = resolveRawArguments(genericType, subType);
+        if (arguments == null)
+            return UnResolvableType.class;
+
+        if (arguments.length != 1)
+            throw new IllegalArgumentException(
+                    "Expected 1 argument for generic type " + genericType + " but found " + arguments.length);
+
+        return arguments[0];
+    }
+
+    public static <T, S extends T> Class<?>[] resolveRawArguments(Class<T> type, Class<S> subType) {
+        return resolveRawArguments(resolveGenericType(type, subType), subType);
+    }
+
     private static Map<TypeVariable<?>, Type> getTypeVariableMap(final Class<?> targetType) {
         Reference<Map<TypeVariable<?>, Type>> ref = typesCache.get(targetType);
         Map<TypeVariable<?>, Type> map = ref != null ? ref.get() : null;
@@ -224,6 +244,54 @@ public abstract class TypeUtils {
         }
 
         return map;
+    }
+
+    public static Type resolveGenericType(Class<?> type, Type subType) {
+        Class<?> rawType;
+        if (subType instanceof ParameterizedType)
+            rawType = (Class<?>) ((ParameterizedType) subType).getRawType();
+        else
+            rawType = (Class<?>) subType;
+
+        if (type.equals(rawType))
+            return subType;
+
+        Type result;
+        if (type.isInterface()) {
+            for (Type superInterface : rawType.getGenericInterfaces())
+                if (superInterface != null && !superInterface.equals(Object.class))
+                    if ((result = resolveGenericType(type, superInterface)) != null)
+                        return result;
+        }
+
+        Type superClass = rawType.getGenericSuperclass();
+        if (superClass != null && !superClass.equals(Object.class))
+            if ((result = resolveGenericType(type, superClass)) != null)
+                return result;
+
+        return null;
+    }
+
+    public static Class<?>[] resolveRawArguments(Type genericType, Class<?> subType) {
+        Class<?>[] result = null;
+
+        if (genericType instanceof ParameterizedType) {
+            ParameterizedType paramType = (ParameterizedType) genericType;
+            Type[] arguments = paramType.getActualTypeArguments();
+            result = new Class[arguments.length];
+            for (int i = 0; i < arguments.length; i++)
+                result[i] = resolveRawClass(arguments[i], subType);
+        } else if (genericType instanceof TypeVariable) {
+            result = new Class[1];
+            result[0] = resolveRawClass(genericType, subType);
+        } else if (genericType instanceof Class) {
+            TypeVariable<?>[] typeParams = ((Class<?>) genericType).getTypeParameters();
+            result = new Class[typeParams.length];
+            for (int i = 0; i < typeParams.length; i++)
+                result[i] = resolveRawClass(typeParams[i], subType);
+        }
+
+        return result;
     }
 
 }
