@@ -48,10 +48,6 @@ public class TypeMappingBuilderImpl implements TypeMappingBuilder {
                     context);
 
             if (matched && !context.getMappings().isEmpty()) {
-                //if (context.getMappings().size() > 1) {
-                    //throw new IllegalStateException("Expected a single mapping");
-                //}
-
                 context.getTypeMappingInfo().addMappings(context.getMappings());
                 context.resetAfterMatch();
             }
