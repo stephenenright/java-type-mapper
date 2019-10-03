@@ -38,6 +38,10 @@ public class TypeConverterCollectionImpl implements TypeConverterCollection {
         TypeConverter<?, ?> converter = convertersCache.get(key);
 
         if (converter != null) {
+            if(converter instanceof NullableTypeConverter) {
+                return null;
+            }
+            
             return converter;
         }
 

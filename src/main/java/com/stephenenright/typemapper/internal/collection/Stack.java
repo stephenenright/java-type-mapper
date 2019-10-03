@@ -11,7 +11,11 @@ public class Stack<T> extends LinkedList<T> {
     }
 
     public T pop() {
-        return remove(size() - 1);
+        if (size() > 0) {
+            return remove(size() - 1);
+        }
+        return null;
+
     }
 
     public T peek() {

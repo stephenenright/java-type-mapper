@@ -28,9 +28,15 @@ public class ArrayToArrayTypeConverter implements TypeConditionalConverter<Objec
                     : null;
 
             if (arrSourceElement != null) {
-                TypeMappingContext<?, ?> elementContext = context.createChild(arrSourceElement,
-                        arrDestElement == null ? arrayElementType : arrDestElement);
-
+                TypeMappingContext<?, ?> elementContext = null;
+                
+                if(arrDestElement==null) {
+                    elementContext = context.createChild(arrSourceElement, arrayElementType);
+                }
+                else {
+                    elementContext = context.createChildForObject(arrSourceElement, arrDestElement);
+                }
+                
                 arrDestElement = elementContext.getMappingService().map(elementContext);
             }
 

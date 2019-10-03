@@ -29,9 +29,15 @@ public class CollectionToArrayTypeConverter implements TypeConditionalConverter<
                     : null;
 
             if (colSourceElement != null) {
-                TypeMappingContext<?, ?> elementContext = context.createChild(colSourceElement,
-                        arrDestElement == null ? arrayElementType : arrDestElement);
-
+                TypeMappingContext<?, ?> elementContext = null;
+                
+                if(arrDestElement == null) {
+                    elementContext = context.createChild(colSourceElement,arrayElementType);
+                }
+                else {
+                    elementContext = context.createChildForObject(colSourceElement,arrDestElement);
+                }
+                
                 arrDestElement = elementContext.getMappingService().map(elementContext);
             }
 

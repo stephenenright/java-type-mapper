@@ -11,8 +11,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.stephenenright.typemapper.test.dto.vending.PaymentProcessorDto;
+import com.stephenenright.typemapper.test.dto.vending.VendingMachineDto;
 import com.stephenenright.typemapper.test.fixture.utils.FixtureUtils;
 import com.stephenenright.typemapper.test.models.vending.PaymentProcessor;
+import com.stephenenright.typemapper.test.models.vending.VendingMachine;
 
 public class TypeMappingBuilderImplTest {
 
@@ -55,6 +57,50 @@ public class TypeMappingBuilderImplTest {
         }
 
         assertTrue("Not all expected mappings matched", expectedMappings.isEmpty());
+        
+        
+        expectedMappings = new HashMap<String, String>();
+        expectedMappings.put("VendingMachine.id", "VendingMachineDto.id");
+        expectedMappings.put("VendingMachine.slots", "VendingMachineDto.slots");
+        expectedMappings.put("VendingMachine.deleted", "VendingMachineDto.deleted");
+        expectedMappings.put("VendingMachine.name", "VendingMachineDto.name");
+        expectedMappings.put("VendingMachine.status", "VendingMachineDto.status");
+        expectedMappings.put("VendingMachine.processor.gateway", "VendingMachineDto.processor.gateway");
+        expectedMappings.put("VendingMachine.processor.deleted", "VendingMachineDto.processor.deleted");
+        expectedMappings.put("VendingMachine.processor.name", "VendingMachineDto.processor.name");
+        expectedMappings.put("VendingMachine.processor.id", "VendingMachineDto.processor.id");
+        expectedMappings.put("VendingMachine.processor.gateway", "VendingMachineDto.processor.gateway");
+        expectedMappings.put("VendingMachine.processor.gateway.deleted", "VendingMachineDto.processor.gateway.deleted");
+        expectedMappings.put("VendingMachine.processor.gateway.name", "VendingMachineDto.processor.gateway.name");
+        expectedMappings.put("VendingMachine.processor.gateway.id", "VendingMachineDto.processor.gateway.id");
+        
+        
+        
+        
+        
+       
+        TypeMappingInfo<VendingMachine, VendingMachineDto> mappingInfo2 = FixtureUtils
+                .createDefaultTypeMappingInfo(VendingMachine.class, VendingMachineDto.class);
+        VendingMachine vendingMachine = new VendingMachine();
+        builder.buildMappings(vendingMachine, mappingInfo2, mappingInfo2.getConfiguration(), mappingInfoRegistry);
+
+        mappingsList = mappingInfo2.getTypeMappings();
+        
+        assertNotNull(mappingsList);
+        
+        assertTrue(mappingsList.size() > 0);
+
+        for (TypeMapping mapping : mappingsList) {
+            String destinationPath = expectedMappings.get(mapping.getSourcePath());
+
+            if (destinationPath.equals(mapping.getDestinationPath())) {
+                expectedMappings.remove(mapping.getSourcePath());
+            }
+        }
+        
+        
+        
+        
     }
 
 }

@@ -37,8 +37,15 @@ public class ArrayToCollectionTypeConverter implements TypeConditionalConverter<
             }
 
             if (sourceElement != null) {
-                TypeMappingContext<?, ?> elementContext = context.createChild(sourceElement,
-                        colDestElement == null ? elementType : colDestElement);
+                TypeMappingContext<?, ?> elementContext = null;
+                
+                if(colDestElement == null) {
+                    elementContext = context.createChild(sourceElement,elementType);
+                }
+                else {
+                    elementContext = context.createChildForObject(sourceElement,colDestElement);
+                }
+                
                 colDestElement = elementContext.getMappingService().map(elementContext);
             }
 

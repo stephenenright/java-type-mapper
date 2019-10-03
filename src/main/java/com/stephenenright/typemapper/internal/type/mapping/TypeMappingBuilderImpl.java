@@ -57,13 +57,23 @@ public class TypeMappingBuilderImpl implements TypeMappingBuilder {
             }
         }
 
+        context.getPropertyMappingPath().destinationPathPop();
+        context.getPropertyMappingPath().sourcePathPop();
         context.sourceTypeInfoPop();
     }
 
     private boolean matchSource(TypeInfo<?> sourceTypeInfo, String destinationPropertyName,
             TypePropertySetter destinationSetter, TypeMappingBuilderContext<?, ?> context) {
-
-        TypePropertyGetter sourceGetter = sourceTypeInfo.getPropertyGetters().get(destinationPropertyName);
+        TypePropertyGetter sourceGetter = null;
+        try {
+            sourceGetter = sourceTypeInfo.getPropertyGetters().get(destinationPropertyName);
+        }
+        catch(Exception e) {
+            throw new RuntimeException(e);
+        }
+        
+        
+       
 
         boolean matched = false;
         if (sourceGetter != null) { // matched destination setter

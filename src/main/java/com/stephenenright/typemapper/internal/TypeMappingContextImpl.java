@@ -164,7 +164,7 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
     }
 
     @Override
-    public <CS, CD> TypeMappingContext<CS, CD> createChild(CS source, CD destination) {
+    public <CS, CD> TypeMappingContext<CS, CD> createChildForObject(CS source, CD destination) {
         AssertUtils.notNull(source, "source");
         AssertUtils.notNull(destination, "destination");
 

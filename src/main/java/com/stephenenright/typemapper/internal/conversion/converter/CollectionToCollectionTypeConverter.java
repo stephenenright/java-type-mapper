@@ -37,8 +37,15 @@ public class CollectionToCollectionTypeConverter implements TypeConverter<Collec
             }
 
             if (sourceElement != null) {
-                TypeMappingContext<?, ?> elementContext = context.createChild(sourceElement,
-                        element == null ? elementType : element);
+                TypeMappingContext<?, ?> elementContext = null;
+                
+                if(element==null) {
+                    elementContext = context.createChild(sourceElement, elementType);
+                }
+                else {
+                    elementContext = context.createChildForObject(sourceElement, element);
+                }
+                
                 element = elementContext.getMappingService().map(elementContext);
             }
 

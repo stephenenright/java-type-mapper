@@ -26,7 +26,7 @@ public interface TypeMappingContext<S, D> {
 
     public <CS, CD> TypeMappingContext<CS, CD> createChild(CS source, Class<CD> destinationType);
 
-    public <CS, CD> TypeMappingContext<CS, CD> createChild(CS source, CD destination);
+    public <CS, CD> TypeMappingContext<CS, CD> createChildForObject(CS source, CD destination);
 
     public TypeMapperConfiguration getConfiguration();
 
