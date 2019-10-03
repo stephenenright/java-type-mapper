@@ -1,6 +1,7 @@
 package com.stephenenright.typemapper.test.dto.vending;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class SlotProductDto {
 
@@ -81,17 +82,34 @@ public class SlotProductDto {
             return productId;
         }
 
+        public void setSlotId(String slotId) {
+            this.slotId = slotId;
+        }
+
+        public void setProductId(String productId) {
+            this.productId = productId;
+        }
+
         public boolean equals(Object o) {
             if (o != null && o instanceof SlotProductId) {
                 SlotProductId that = (SlotProductId) o;
-                return this.productId.equals(that.productId) && this.slotId.equals(that.slotId);
+                return Objects.equals(this.productId, that.productId) && Objects.equals(this.slotId, that.slotId);
             } else {
                 return false;
             }
         }
 
         public int hashCode() {
-            return productId.hashCode() + slotId.hashCode();
+            int hashCode = 31;
+            if (productId != null) {
+                hashCode += productId.hashCode() * 31;
+            }
+
+            if (slotId != null) {
+                hashCode += slotId.hashCode() * 31;
+            }
+
+            return hashCode;
         }
     }
 }

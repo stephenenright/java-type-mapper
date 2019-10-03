@@ -45,6 +45,13 @@ public class TypeMappingInfoImpl<S, D> implements TypeMappingInfo<S, D> {
     public void addMapping(TypeMapping mapping) {
         this.mappings.add(mapping);
     }
+    
+    @Override
+    public void addMappings(List<TypeMapping> mappings) {
+        for(TypeMapping mapping: mappings) {
+            this.mappings.add(mapping);
+        }
+    }
 
     @Override
     public TypeConverter<S, D> getConverter() {

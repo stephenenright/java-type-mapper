@@ -16,7 +16,11 @@ public abstract class CollectionUtils {
     private CollectionUtils() {
 
     }
-
+    
+    public static boolean isCollection(Class<?> type) {
+        return Collection.class.isAssignableFrom(type);
+    }
+    
     public static <E> List<E> asLinkedList(E[] elements) {
         if (elements == null || elements.length == 0) {
             return new LinkedList<E>();

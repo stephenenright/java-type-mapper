@@ -17,7 +17,9 @@ import com.stephenenright.typemapper.internal.type.info.TypePropertySetter;
 import com.stephenenright.typemapper.internal.type.mapping.TypeMapping;
 import com.stephenenright.typemapper.internal.type.mapping.TypeMappingInfo;
 import com.stephenenright.typemapper.internal.type.mapping.TypeMappingInfoRegistry;
+import com.stephenenright.typemapper.internal.util.ArrayUtils;
 import com.stephenenright.typemapper.internal.util.ClassUtils;
+import com.stephenenright.typemapper.internal.util.CollectionUtils;
 import com.stephenenright.typemapper.internal.util.ListUtils;
 import com.stephenenright.typemapper.internal.util.ObjectUtils;
 import com.stephenenright.typemapper.internal.util.ProxyUtils;
@@ -47,8 +49,16 @@ public class TypeMappingServiceImpl implements TypeMappingService {
     @Override
     public <S, D> D map(TypeMappingContext<S, D> context) {
         TypeMappingContextImpl<S, D> contextImpl = (TypeMappingContextImpl<S, D>) context;
+        Class<D> destinationType = context.getDestinationType();
         D destinationObj = null;
-
+        
+        if (!CollectionUtils.isCollection(destinationType) && !ArrayUtils.isArray(destinationType)) {
+            D potentialCircularDest = contextImpl.destinationForSource();
+            if (potentialCircularDest != null && potentialCircularDest.getClass().isAssignableFrom(contextImpl.getDestinationType())) {
+                return potentialCircularDest;
+            } 
+        }
+        
         TypeMappingInfo<S, D> mappingInfo = mappingInfoRegistry.get(context.getSourceType(),
                 context.getDestinationType());
 
@@ -69,7 +79,7 @@ public class TypeMappingServiceImpl implements TypeMappingService {
             }
         }
 
-        contextImpl.setDestination(destinationObj);
+        contextImpl.setDestination(destinationObj,true);
         return destinationObj;
     }
 
@@ -151,7 +161,7 @@ public class TypeMappingServiceImpl implements TypeMappingService {
     @Override
     public <S, D> D createDestination(TypeMappingContext<S, D> context) {
         D destination = createDestination(context.getDestinationType());
-        ((TypeMappingContextImpl<S, D>) context).setDestination(destination);
+        ((TypeMappingContextImpl<S, D>) context).setDestination(destination,true);
         return destination;
     }
 
@@ -201,7 +211,7 @@ public class TypeMappingServiceImpl implements TypeMappingService {
         Object destinationValue = null;
         if (propertyContext.isProvidedDestination() && getter != null) {
             destinationValue = getter.getValue(destination);
-            propertyContext.setDestination(destinationValue);
+            propertyContext.setDestination(destinationValue,true);
         }
 
         if (converter != null) {

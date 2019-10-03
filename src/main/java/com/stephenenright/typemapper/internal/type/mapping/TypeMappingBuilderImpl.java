@@ -48,11 +48,11 @@ public class TypeMappingBuilderImpl implements TypeMappingBuilder {
                     context);
 
             if (matched && !context.getMappings().isEmpty()) {
-                if (context.getMappings().size() > 1) {
-                    throw new IllegalStateException("Expected a single mapping");
-                }
+                //if (context.getMappings().size() > 1) {
+                    //throw new IllegalStateException("Expected a single mapping");
+                //}
 
-                context.getTypeMappingInfo().addMapping(context.getMappings().get(0));
+                context.getTypeMappingInfo().addMappings(context.getMappings());
                 context.resetAfterMatch();
             }
         }
@@ -64,22 +64,13 @@ public class TypeMappingBuilderImpl implements TypeMappingBuilder {
 
     private boolean matchSource(TypeInfo<?> sourceTypeInfo, String destinationPropertyName,
             TypePropertySetter destinationSetter, TypeMappingBuilderContext<?, ?> context) {
-        TypePropertyGetter sourceGetter = null;
-        try {
-            sourceGetter = sourceTypeInfo.getPropertyGetters().get(destinationPropertyName);
-        }
-        catch(Exception e) {
-            throw new RuntimeException(e);
-        }
-        
-        
+        TypePropertyGetter sourceGetter = sourceTypeInfo.getPropertyGetters().get(destinationPropertyName);
        
-
         boolean matched = false;
         if (sourceGetter != null) { // matched destination setter
             context.getPropertyMappingPath().sourcePathPush(destinationPropertyName, sourceGetter);
 
-            TypeMappingInfo<?, ?> mappingInfo = context.getMappingInfoRegistry().get(sourceGetter.getType(),
+            TypeMappingInfo<?, ?> mappingInfo =  context.getMappingInfoRegistry().get(sourceGetter.getType(),
                     destinationSetter.getType());
 
             if (mappingInfo != null) {
@@ -173,7 +164,7 @@ public class TypeMappingBuilderImpl implements TypeMappingBuilder {
 
         public void cloneMappings(TypeMappingInfo<?, ?> typeMappingInfo) {
             for (TypeMapping mapping : typeMappingInfo.getTypeMappings()) {
-                mappings.add(new TypeMappingImpl(mapping, mapping.getSourceGetters(), mapping.getDestinationSetters()));
+                mappings.add(new TypeMappingImpl(mapping, propertyMappingPath.getSourceProperties(), propertyMappingPath.getDestinationProperties()));
             }
         }
 

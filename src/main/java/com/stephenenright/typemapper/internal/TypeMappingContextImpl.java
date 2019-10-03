@@ -3,6 +3,7 @@ package com.stephenenright.typemapper.internal;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import com.stephenenright.typemapper.internal.type.info.TypePropertyGetter;
 import com.stephenenright.typemapper.internal.type.info.TypePropertySetter;
 import com.stephenenright.typemapper.internal.type.mapping.TypeMapping;
 import com.stephenenright.typemapper.internal.util.AssertUtils;
+import com.stephenenright.typemapper.internal.util.ClassUtils;
 import com.stephenenright.typemapper.internal.util.FunctionalUtils;
 import com.stephenenright.typemapper.internal.util.ObjectUtils;
 import com.stephenenright.typemapper.internal.util.PropertyPathUtils;
@@ -29,6 +31,7 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
     private final Class<S> sourceType;
     private final Class<D> destinationType;
     private D destination;
+    private final Map<Object, Object> sourceToDestination;
     private final Type genericDestinationType;
     private final TypeMappingService mappingService;
     private TypeMapping mapping;
@@ -59,6 +62,7 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
         this.mappingService = mappingService;
         this.processedPaths = new LinkedList<String>();
         this.destinationCache = new HashMap<String, Object>();
+        this.sourceToDestination = new IdentityHashMap<Object, Object>();
 
     }
 
@@ -98,6 +102,7 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
 
         this.processedPaths = inherit ? contextImpl.processedPaths : new LinkedList<String>();
         this.destinationCache = inherit ? contextImpl.destinationCache : new HashMap<String, Object>();
+        sourceToDestination = contextImpl.sourceToDestination;
 
     }
 
@@ -139,8 +144,17 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
         return this.destinationPath;
     }
 
-    public void setDestination(D destination) {
+    @SuppressWarnings("unchecked")
+    public D destinationForSource() {
+        return (D) sourceToDestination.get(source);
+    }
+
+    public void setDestination(D destination, boolean trackSource) {
         this.destination = destination;
+
+        if (trackSource && !ClassUtils.isPrimitiveWrapper(sourceType)) {
+            sourceToDestination.put(source, destination);
+        }
     }
 
     @Override
@@ -245,8 +259,6 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
             i++;
 
         }
-        
-      
 
         return currentValue;
     }
@@ -272,15 +284,9 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
     public boolean isProvidedDestination() {
         return providedDestination;
     }
-    
-    
+
     public void addDestinationToCache(String path, Object destination) {
-        destinationCache.put(path,destination);
+        destinationCache.put(path, destination);
     }
-    
-    
-    
-    
-    
-    
+
 }

@@ -11,6 +11,11 @@ public abstract class ArrayUtils {
 
     }
 
+    public static boolean isArray(Class<?> type) {
+        return type.isArray();
+
+    }
+
     public static Object getArrayElementSafe(Object array, int index) {
         if (array == null) {
             return null;

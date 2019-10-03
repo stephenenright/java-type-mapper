@@ -80,6 +80,14 @@ public class SlotProduct {
         public String getProductId() {
             return productId;
         }
+     
+        public void setSlotId(String slotId) {
+            this.slotId = slotId;
+        }
+
+        public void setProductId(String productId) {
+            this.productId = productId;
+        }
 
         public boolean equals(Object o) {
             if (o != null && o instanceof SlotProductId) {
@@ -91,7 +99,16 @@ public class SlotProduct {
         }
 
         public int hashCode() {
-            return productId.hashCode() + slotId.hashCode();
+            int hashCode = 31;
+            if(productId!=null) {
+                hashCode += productId.hashCode() * 31;
+            }
+            
+            if(slotId!=null) {
+                hashCode += slotId.hashCode() * 31;
+            }
+            
+            return hashCode;
         }
     }
 }

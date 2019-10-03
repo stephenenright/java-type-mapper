@@ -240,6 +240,7 @@ public abstract class ObjectUtils {
         Constructor<T> constructor = cls.getDeclaredConstructor();
         ReflectionUtils.makeAccessible(constructor);
         return constructor.newInstance();
+
     }
 
     public static <T> T newInstance(Constructor<T> constructor, Object... constructorArgs)
