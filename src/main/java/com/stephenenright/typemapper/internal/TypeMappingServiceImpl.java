@@ -9,6 +9,8 @@ import com.stephenenright.typemapper.TypeMappingContext;
 import com.stephenenright.typemapper.TypeToken;
 import com.stephenenright.typemapper.configuration.TypeMapperConfiguration;
 import com.stephenenright.typemapper.converter.TypeConverter;
+import com.stephenenright.typemapper.exception.TypeMappingException;
+import com.stephenenright.typemapper.internal.common.error.Errors;
 import com.stephenenright.typemapper.internal.conversion.TypeConverterRegistry;
 import com.stephenenright.typemapper.internal.type.info.TypeInfoRegistry;
 import com.stephenenright.typemapper.internal.type.info.TypePropertyGetter;
@@ -48,39 +50,44 @@ public class TypeMappingServiceImpl implements TypeMappingService {
     @SuppressWarnings("unchecked")
     @Override
     public <S, D> D map(TypeMappingContext<S, D> context) {
-        TypeMappingContextImpl<S, D> contextImpl = (TypeMappingContextImpl<S, D>) context;
-        Class<D> destinationType = context.getDestinationType();
-        D destinationObj = null;
-        
-        if (!CollectionUtils.isCollection(destinationType) && !ArrayUtils.isArray(destinationType)) {
-            D potentialCircularDest = contextImpl.destinationForSource();
-            if (potentialCircularDest != null && potentialCircularDest.getClass().isAssignableFrom(contextImpl.getDestinationType())) {
-                return potentialCircularDest;
-            } 
-        }
-        
-        TypeMappingInfo<S, D> mappingInfo = mappingInfoRegistry.get(context.getSourceType(),
-                context.getDestinationType());
+        try {
+            TypeMappingContextImpl<S, D> contextImpl = (TypeMappingContextImpl<S, D>) context;
+            Class<D> destinationType = context.getDestinationType();
+            D destinationObj = null;
 
-        if (mappingInfo != null) {
-            destinationObj = mapWithInfo(contextImpl, mappingInfo);
-        } else {
-            TypeConverter<S, D> converter = getTypeConverterForContext(context);
-
-            if (converter != null) {
-                destinationObj = convertWithTypeConverter(context, converter);
-            } else if (converter == null
-                    && ClassUtils.isNotPrimitive(context.getSourceType(), context.getDestinationType())) {
-                mappingInfo = mappingInfoRegistry.getOrRegister(context.getSource(), context.getSourceType(),
-                        context.getDestinationType(), this, context.getConfiguration());
-                destinationObj = mapWithInfo(contextImpl, mappingInfo);
-            } else if (context.getDestinationType().isAssignableFrom(context.getSourceType())) {
-                destinationObj = (D) context.getSource();
+            if (!CollectionUtils.isCollection(destinationType) && !ArrayUtils.isArray(destinationType)) {
+                D potentialCircularDest = contextImpl.destinationForSource();
+                if (potentialCircularDest != null
+                        && potentialCircularDest.getClass().isAssignableFrom(contextImpl.getDestinationType())) {
+                    return potentialCircularDest;
+                }
             }
-        }
 
-        contextImpl.setDestination(destinationObj,true);
-        return destinationObj;
+            TypeMappingInfo<S, D> mappingInfo = mappingInfoRegistry.get(context.getSourceType(),
+                    context.getDestinationType());
+
+            if (mappingInfo != null) {
+                destinationObj = mapWithInfo(contextImpl, mappingInfo);
+            } else {
+                TypeConverter<S, D> converter = getTypeConverterForContext(context);
+
+                if (converter != null) {
+                    destinationObj = convertWithTypeConverter(context, converter);
+                } else if (converter == null
+                        && ClassUtils.isNotPrimitive(context.getSourceType(), context.getDestinationType())) {
+                    mappingInfo = mappingInfoRegistry.getOrRegister(context.getSource(), context.getSourceType(),
+                            context.getDestinationType(), this, context.getConfiguration());
+                    destinationObj = mapWithInfo(contextImpl, mappingInfo);
+                } else if (context.getDestinationType().isAssignableFrom(context.getSourceType())) {
+                    destinationObj = (D) context.getSource();
+                }
+            }
+
+            contextImpl.setDestination(destinationObj, true);
+            return destinationObj;
+        } catch (Throwable t) {
+            throw Errors.createGenericMappingExceptionIfNecessary(t, context);
+        }
     }
 
     private <D> D mapInternal(Object source, @Nullable D destination, Type destinationType) {
@@ -106,8 +113,11 @@ public class TypeMappingServiceImpl implements TypeMappingService {
 
         try {
             return converter.convert(context);
-        } catch (Exception e) {
+        } catch (TypeMappingException e) {
             throw e;
+        } catch (Throwable t) {
+            throw new Errors().errorTypeConversion(context.getSourceType(), context.getDestinationType(), converter, t)
+                    .toMappingException();
         }
     }
 
@@ -128,8 +138,7 @@ public class TypeMappingServiceImpl implements TypeMappingService {
     private <S, D> D mapWithInfo(TypeMappingContext<S, D> context, TypeMappingInfo<S, D> typeMap) {
 
         if (typeMap.getConverter() != null) {
-            // TODO HANDLE ERRORS
-            return typeMap.getConverter().convert(context);
+            return convertWithTypeConverter(context, typeMap.getConverter());
         }
 
         if (context.getDestination() == null) {
@@ -154,14 +163,15 @@ public class TypeMappingServiceImpl implements TypeMappingService {
         }
 
         Object sourceObject = resolveSourceValue(mapping, context);
-        TypeMappingContextImpl<Object, Object> propertyContext = createContextForProperty(sourceObject, mapping, context);  
-        setDestinationValue(mapping,propertyContext,context);
+        TypeMappingContextImpl<Object, Object> propertyContext = createContextForProperty(sourceObject, mapping,
+                context);
+        setDestinationValue(mapping, propertyContext, context);
     }
 
     @Override
     public <S, D> D createDestination(TypeMappingContext<S, D> context) {
         D destination = createDestination(context.getDestinationType());
-        ((TypeMappingContextImpl<S, D>) context).setDestination(destination,true);
+        ((TypeMappingContextImpl<S, D>) context).setDestination(destination, true);
         return destination;
     }
 
@@ -211,7 +221,7 @@ public class TypeMappingServiceImpl implements TypeMappingService {
         Object destinationValue = null;
         if (propertyContext.isProvidedDestination() && getter != null) {
             destinationValue = getter.getValue(destination);
-            propertyContext.setDestination(destinationValue,true);
+            propertyContext.setDestination(destinationValue, true);
         }
 
         if (converter != null) {
@@ -229,7 +239,8 @@ public class TypeMappingServiceImpl implements TypeMappingService {
 
         if (destinationValue != null) {
             setter.setValue(destination,
-                    destinationValue == null ? ClassUtils.getPrimitiveDefaultValue(setter.getType()) : destinationValue);
+                    destinationValue == null ? ClassUtils.getPrimitiveDefaultValue(setter.getType())
+                            : destinationValue);
 
         }
 

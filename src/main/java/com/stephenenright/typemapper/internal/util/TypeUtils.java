@@ -3,7 +3,11 @@ package com.stephenenright.typemapper.internal.util;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -111,6 +115,18 @@ public abstract class TypeUtils {
 
     public static String toString(Type type) {
         return type instanceof Class ? ((Class<?>) type).getName() : type.toString();
+    }
+
+    public static String toString(Member member) {
+        if (member instanceof Field) {
+            return member.getDeclaringClass().getName() + "." + member.getName();
+        } 
+        else if (member instanceof Method) {
+            return member.getDeclaringClass().getName() + "." + member.getName() + "()";
+        } else if (member instanceof Constructor) {
+            return member.getDeclaringClass().getName() + ".<init>()";
+        }
+        return null;
     }
 
     public static Type resolveBound(TypeVariable<?> typeVariable) {

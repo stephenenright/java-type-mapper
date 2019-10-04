@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 import com.stephenenright.typemapper.exception.PropertyGetterException;
+import com.stephenenright.typemapper.internal.common.error.Errors;
 
 class TypePropertyMethodGetterImpl extends TypePropertyInfoBase<Method> implements TypePropertyGetter {
 
@@ -21,8 +22,8 @@ class TypePropertyMethodGetterImpl extends TypePropertyInfoBase<Method> implemen
         try {
             return member.invoke(source);
         } catch (Exception e) {
-            throw new PropertyGetterException("Unable to get value for method: " + member.getName() + ", for type: "
-                    + member.getDeclaringClass().getName(), e);
+            throw new Errors().errorGettingPropertyValue(member, e).toPropertyGetterMappingException();
+
         }
     }
 

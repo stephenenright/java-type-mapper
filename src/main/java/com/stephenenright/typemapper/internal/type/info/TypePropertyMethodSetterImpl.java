@@ -3,7 +3,7 @@ package com.stephenenright.typemapper.internal.type.info;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
-import com.stephenenright.typemapper.exception.PropertySetterException;
+import com.stephenenright.typemapper.internal.common.error.Errors;
 
 class TypePropertyMethodSetterImpl extends TypePropertyInfoBase<Method> implements TypePropertySetter {
 
@@ -15,15 +15,13 @@ class TypePropertyMethodSetterImpl extends TypePropertyInfoBase<Method> implemen
     public Type getGenericType() {
         return member.getGenericParameterTypes()[0];
     }
-    
- 
+
     @Override
     public void setValue(Object target, Object value) {
         try {
             member.invoke(target, value);
         } catch (Exception e) {
-            throw new PropertySetterException("Error setting value using method: " + member.getName() + ", for type: "
-                    + member.getDeclaringClass().getName(), e);
+            throw new Errors().errorSettingPropertyValue(member, value, e).toPropertySetterMappingException();
         }
     }
 
@@ -31,5 +29,5 @@ class TypePropertyMethodSetterImpl extends TypePropertyInfoBase<Method> implemen
     public String toString() {
         return member == null ? name : member.getDeclaringClass().getSimpleName() + "." + name;
     }
-    
+
 }
