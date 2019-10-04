@@ -12,17 +12,17 @@ import com.stephenenright.typemapper.internal.util.TypeUtils;
 public class Errors {
 
     private ErrorDetail error = null;
-    
-    
-    public static RuntimeException createGenericMappingExceptionIfNecessary(Throwable t, TypeMappingContext<?, ?> context) {
-        if(t instanceof TypeMappingException) {
+
+    public static RuntimeException createGenericMappingExceptionIfNecessary(Throwable t,
+            TypeMappingContext<?, ?> context) {
+        if (t instanceof TypeMappingException) {
             return (TypeMappingException) t;
         }
-        
-        return new Errors().errorGenericMapping(context.getSourceType(), context.getDestinationType(), t).toMappingException();
+
+        return new Errors().errorGenericMapping(context.getSourceType(), context.getDestinationType(), t)
+                .toMappingException();
     }
-    
-    
+
     public Errors errorSettingPropertyValue(Member member, Object value, Throwable t) {
         String message = String.format("Unable to set property value: %s on member: %s", value,
                 TypeUtils.toString(member));
@@ -42,15 +42,13 @@ public class Errors {
 
         return addError(new ErrorDetail(message, t));
     }
-    
-    public Errors errorGenericMapping(Class<?> sourceType, Class<?> destinationType,  Throwable t) {
 
-        String message = String.format("Mapping failed from %s to %s",
-                sourceType.getName(), destinationType.getName());
+    public Errors errorGenericMapping(Class<?> sourceType, Class<?> destinationType, Throwable t) {
+
+        String message = String.format("Mapping failed from %s to %s", sourceType.getName(), destinationType.getName());
 
         return addError(new ErrorDetail(message, t));
     }
-    
 
     public TypeMappingException toPropertyGetterMappingException() {
         return new PropertyGetterException(error.getMessage(), error.getCause());
@@ -59,11 +57,10 @@ public class Errors {
     public TypeMappingException toPropertySetterMappingException() {
         return new PropertySetterException(error.getMessage(), error.getCause());
     }
-    
+
     public TypeMappingException toMappingException() {
         return new TypeMappingException(error.getMessage(), error.getCause());
     }
-    
 
     private Errors addError(ErrorDetail error) {
         this.error = error;
