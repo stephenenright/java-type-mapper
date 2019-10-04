@@ -1,5 +1,6 @@
 package com.stephenenright.typemapper.internal.type.info;
 
+import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 
 public interface TypePropertyInfo {
@@ -17,7 +18,7 @@ public interface TypePropertyInfo {
      * @return the type
      */
     public Class<?> getType();
-    
+
     public Class<?> getTypeInDeclaringClass();
 
     /**
@@ -26,8 +27,7 @@ public interface TypePropertyInfo {
      * @return the property generic type
      */
     public Type getGenericType();
-    
-    
-    
+
+    public Member getMember();
 
 }

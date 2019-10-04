@@ -1,7 +1,9 @@
 package com.stephenenright.typemapper.test.dto.vending;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class VendingMachineDto extends BaseDto {
 
@@ -9,6 +11,7 @@ public class VendingMachineDto extends BaseDto {
     private List<SlotDto> slots = new LinkedList<SlotDto>();
     private PaymentProcessorDto processor;
     private Integer status;
+    private Map<String, Object> configuration = new HashMap<String, Object>();
 
     public String getName() {
         return name;
@@ -40,6 +43,14 @@ public class VendingMachineDto extends BaseDto {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public Map<String, Object> getConfiguration() {
+        return configuration;
+    }
+
+    public void setConfiguration(Map<String, Object> configuration) {
+        this.configuration = configuration;
     }
 
 }

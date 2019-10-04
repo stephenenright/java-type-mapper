@@ -1,7 +1,9 @@
 package com.stephenenright.typemapper.test.models.vending;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class VendingMachine extends BaseModel {
 
@@ -9,6 +11,7 @@ public class VendingMachine extends BaseModel {
     private List<Slot> slots = new LinkedList<Slot>();
     private PaymentProcessor processor;
     private VendingMachineStatus status;
+    private Map<String, Object> configuration = new HashMap<String, Object>();
 
     public String getName() {
         return name;
@@ -42,4 +45,11 @@ public class VendingMachine extends BaseModel {
         this.status = status;
     }
 
+    public Map<String, Object> getConfiguration() {
+        return configuration;
+    }
+
+    public void setConfiguration(Map<String, Object> configuration) {
+        this.configuration = configuration;
+    }
 }

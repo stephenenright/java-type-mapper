@@ -26,11 +26,15 @@ abstract class TypePropertyInfoBase<M extends Member> implements TypePropertyInf
     public Class<?> getType() {
         return type;
     }
-    
-    
+
     @Override
     public Class<?> getTypeInDeclaringClass() {
-       return typeInDeclaringClass;
+        return typeInDeclaringClass;
+    }
+
+    @Override
+    public Member getMember() {
+        return member;
     }
 
     private Class<?> resolveType(Class<?> type) {

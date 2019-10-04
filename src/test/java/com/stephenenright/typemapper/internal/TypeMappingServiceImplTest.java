@@ -1,6 +1,7 @@
 package com.stephenenright.typemapper.internal;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -127,6 +128,12 @@ public class TypeMappingServiceImplTest {
         machine.setName("Vending Machine 1");
         machine.setDeleted(true);
         machine.setProcessor(processor);
+        
+        Map<String,Object> configuration = new HashMap<String, Object>();
+        configuration.put("exactAmountRequired", false);
+        configuration.put("shutdownWhenEmpty", true);
+        machine.setConfiguration(configuration);
+        
 
         List<Slot> slots = new LinkedList<Slot>();
 
@@ -153,7 +160,12 @@ public class TypeMappingServiceImplTest {
         assertEquals("V1", result.getId());
         assertEquals("Vending Machine 1", result.getName());
         assertEquals(true, result.isDeleted());
-
+        
+        assertTrue(!result.getConfiguration().isEmpty());
+        assertTrue((Boolean) result.getConfiguration().get("shutdownWhenEmpty")); 
+        assertFalse((Boolean) result.getConfiguration().get("exactAmountRequired")); 
+        
+   
         PaymentProcessorDto processorDto = result.getProcessor();
         assertEquals("P1", processorDto.getId());
         assertEquals("PRO Name 1", processorDto.getName());
