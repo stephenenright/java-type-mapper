@@ -180,8 +180,7 @@ public class TypeMappingServiceImpl implements TypeMappingService {
             D destination = ObjectUtils.newInstance(type);
             return destination;
         } catch (Exception e) {
-            // TODO Fix this
-            throw new RuntimeException("Unable to create instance", e);
+            throw new Errors().errorCreatingDestination(type, e).toMappingException();
         }
     }
 

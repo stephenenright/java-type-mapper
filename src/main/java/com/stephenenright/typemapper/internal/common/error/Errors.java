@@ -43,6 +43,15 @@ public class Errors {
         return addError(new ErrorDetail(message, t));
     }
 
+    public Errors errorCreatingDestination(Class<?> type, Throwable t) {
+        String message = String.format(
+                "Unable to create instance of %s. Please ensure there is a non private no argument constructor",
+                type.getName());
+
+        return addError(new ErrorDetail(message, t));
+
+    }
+
     public Errors errorGenericMapping(Class<?> sourceType, Class<?> destinationType, Throwable t) {
 
         String message = String.format("Mapping failed from %s to %s", sourceType.getName(), destinationType.getName());
