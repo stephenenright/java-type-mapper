@@ -5,9 +5,9 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.stephenenright.typemapper.TypeMapperConfiguration;
 import com.stephenenright.typemapper.TypeMappingContext;
 import com.stephenenright.typemapper.TypeToken;
-import com.stephenenright.typemapper.configuration.TypeMapperConfiguration;
 import com.stephenenright.typemapper.converter.TypeConverter;
 import com.stephenenright.typemapper.exception.TypeMappingException;
 import com.stephenenright.typemapper.internal.common.error.Errors;
@@ -44,7 +44,12 @@ public class TypeMappingServiceImpl implements TypeMappingService {
 
     @Override
     public <S, D> D map(S src, Class<D> destination) {
-        return mapInternal(src, null, destination);
+        return map(src,destination,null);
+    }
+    
+    @Override
+    public <S, D> D map(S src, Class<D> destination, TypeMapperConfiguration configuration) {
+        return mapInternal(src, null, destination, configuration);
     }
 
     @SuppressWarnings("unchecked")
@@ -69,14 +74,14 @@ public class TypeMappingServiceImpl implements TypeMappingService {
             if (mappingInfo != null) {
                 destinationObj = mapWithInfo(contextImpl, mappingInfo);
             } else {
-                TypeConverter<S, D> converter = getTypeConverterForContext(context);
+                TypeConverter<S, D> converter = getTypeConverterFromContext(contextImpl);
 
                 if (converter != null) {
                     destinationObj = convertWithTypeConverter(context, converter);
                 } else if (converter == null
                         && ClassUtils.isNotPrimitive(context.getSourceType(), context.getDestinationType())) {
                     mappingInfo = mappingInfoRegistry.getOrRegister(context.getSource(), context.getSourceType(),
-                            context.getDestinationType(), this, context.getConfiguration());
+                            context.getDestinationType(), this, contextImpl);
                     destinationObj = mapWithInfo(contextImpl, mappingInfo);
                 } else if (context.getDestinationType().isAssignableFrom(context.getSourceType())) {
                     destinationObj = (D) context.getSource();
@@ -90,22 +95,46 @@ public class TypeMappingServiceImpl implements TypeMappingService {
         }
     }
 
-    private <D> D mapInternal(Object source, @Nullable D destination, Type destinationType) {
+    private <D> D mapInternal(Object source, @Nullable D destination, Type destinationType, 
+            TypeMapperConfiguration configuration) {
         if (destination != null)
             destinationType = ProxyUtils.<D>unProxy(destination.getClass());
         return mapInternal(source, ProxyUtils.<Object>unProxy(source.getClass()), destination,
-                TypeToken.<D>of(destinationType));
+                TypeToken.<D>of(destinationType),configuration);
     }
 
-    private <S, D> D mapInternal(S source, Class<S> sourceType, D destination, TypeToken<D> destinationTypeToken) {
+    private <S, D> D mapInternal(S source, Class<S> sourceType, D destination, 
+            TypeToken<D> destinationTypeToken,TypeMapperConfiguration configuration) {
 
-        TypeMappingContextImpl<S, D> context = new TypeMappingContextImpl<S, D>(TypeMapperConfiguration.create(),
+        TypeMappingContextImpl<S, D> context = new TypeMappingContextImpl<S, D>(
+                configuration==null ? TypeMapperConfiguration.create() : configuration,
                 source, sourceType, destination, destinationTypeToken.getRawType(), destinationTypeToken.getType(),
                 this);
 
         return map(context);
     }
+    
+    @Override
+    public <S, D> TypeConverter<S, D> getTypeConverter(TypeMappingContext<S, D> context) {
+        return getTypeConverter(context.getSourceType(), context.getDestinationType());
+    }
+    
+    @Override
+    public <S,D> TypeConverter<S,D> getTypeConverter(Class<S> sourceType, Class<D> destinationType) {
+        TypeConverter<S, D> foundConverter = null;
 
+        for (TypeConverterRegistry registry : converterRegistryList) {
+            foundConverter = registry.getConverter(sourceType, destinationType);
+
+            if (foundConverter != null) {
+                return foundConverter;
+            }
+        }
+
+        return foundConverter;
+    }
+    
+    
     private <S, D> D convertWithTypeConverter(TypeMappingContext<S, D> context, TypeConverter<S, D> converter) {
         if (converter == null) {
             return null;
@@ -121,19 +150,6 @@ public class TypeMappingServiceImpl implements TypeMappingService {
         }
     }
 
-    private <S, D> TypeConverter<S, D> getTypeConverterForContext(TypeMappingContext<S, D> context) {
-        TypeConverter<S, D> foundConverter = null;
-
-        for (TypeConverterRegistry registry : converterRegistryList) {
-            foundConverter = registry.getConverter(context.getSourceType(), context.getDestinationType());
-
-            if (foundConverter != null) {
-                return foundConverter;
-            }
-        }
-
-        return foundConverter;
-    }
 
     private <S, D> D mapWithInfo(TypeMappingContext<S, D> context, TypeMappingInfo<S, D> typeMap) {
 
@@ -228,7 +244,7 @@ public class TypeMappingServiceImpl implements TypeMappingService {
         } else if (propertyContext.getSource() != null) {
             destinationValue = map(propertyContext);
         } else {
-            converter = getTypeConverterForContext(propertyContext);
+            converter = getTypeConverterFromContext(propertyContext);
             if (converter != null) {
                 destinationValue = convertWithTypeConverter(propertyContext, converter);
             }
@@ -264,5 +280,11 @@ public class TypeMappingServiceImpl implements TypeMappingService {
         return new TypeMappingContextImpl(context, source, sourceType, null, destinationType, genericDestinationType,
                 mapping, true);
     }
+    
+    
+    public <S, D> TypeConverter<S, D> getTypeConverterFromContext(TypeMappingContextImpl<S, D> context) {
+        return context.getTypeConverter(context.getSourceType(), context.getDestinationType());
+    }
+    
 
 }

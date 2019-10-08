@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.stephenenright.typemapper.TypeIntrospector;
-import com.stephenenright.typemapper.configuration.TypeMapperConfiguration;
+import com.stephenenright.typemapper.TypeMapperConfiguration;
 import com.stephenenright.typemapper.internal.common.Pair;
 import com.stephenenright.typemapper.internal.util.JavaBeanUtils;
 import com.stephenenright.typemapper.internal.util.MemberUtils;

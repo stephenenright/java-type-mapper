@@ -9,9 +9,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import javax.annotation.Nullable;
+
+import com.stephenenright.typemapper.TypeMapperConfiguration;
+import com.stephenenright.typemapper.TypeMappingConfiguration;
 import com.stephenenright.typemapper.TypeMappingContext;
 import com.stephenenright.typemapper.TypeToken;
-import com.stephenenright.typemapper.configuration.TypeMapperConfiguration;
+import com.stephenenright.typemapper.converter.TypeConverter;
 import com.stephenenright.typemapper.internal.common.CommonConstants;
 import com.stephenenright.typemapper.internal.type.info.TypeInfoRegistry;
 import com.stephenenright.typemapper.internal.type.info.TypePropertyGetter;
@@ -221,6 +225,7 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
      * @param <D>
      * @return the destination value of the parent
      */
+    @SuppressWarnings("unchecked")
     public <S, D> Object resolveParentDestination(TypeInfoRegistry typeInfoRegistry) {
         List<TypePropertySetter> setterList = mapping.getDestinationSetters();
         StringBuilder destPathBuilder = new StringBuilder().append(parent.destinationPath);
@@ -279,6 +284,11 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
             }
 
         };
+    }
+
+    @SuppressWarnings("hiding")
+    public <S, D> TypeConverter<S, D> getTypeConverter(Class<S> sourceType, Class<D> destinationType) {
+        return mappingService.getTypeConverter(sourceType, destinationType);
     }
 
     public boolean isProvidedDestination() {

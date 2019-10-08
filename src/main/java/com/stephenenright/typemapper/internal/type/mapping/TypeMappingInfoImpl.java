@@ -3,7 +3,7 @@ package com.stephenenright.typemapper.internal.type.mapping;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.stephenenright.typemapper.configuration.TypeMapperConfiguration;
+import com.stephenenright.typemapper.TypeMapperConfiguration;
 import com.stephenenright.typemapper.converter.TypeConverter;
 
 public class TypeMappingInfoImpl<S, D> implements TypeMappingInfo<S, D> {

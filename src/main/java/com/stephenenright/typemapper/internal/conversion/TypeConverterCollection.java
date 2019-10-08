@@ -11,4 +11,6 @@ public interface TypeConverterCollection {
 
     public TypeConverter<?, ?> findConverter(Class<?> sourceType, Class<?> destinationType);
 
+    public boolean isEmpty();
+
 }

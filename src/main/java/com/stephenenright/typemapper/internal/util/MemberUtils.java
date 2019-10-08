@@ -3,7 +3,7 @@ package com.stephenenright.typemapper.internal.util;
 import java.lang.reflect.Member;
 import java.lang.reflect.Modifier;
 
-import com.stephenenright.typemapper.configuration.TypeAccessLevel;
+import com.stephenenright.typemapper.TypeAccessLevel;
 
 public abstract class MemberUtils {
 

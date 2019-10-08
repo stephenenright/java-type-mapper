@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.stephenenright.typemapper.configuration.TypeMapperConfiguration;
+import com.stephenenright.typemapper.TypeMapperConfiguration;
 import com.stephenenright.typemapper.internal.collection.ConcurrentReferenceHashMap;
 
 public class TypePropertyInfoRegistryImpl implements TypePropertyInfoRegistry {

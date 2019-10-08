@@ -2,7 +2,8 @@ package com.stephenenright.typemapper.internal.type.mapping;
 
 import java.util.Map;
 
-import com.stephenenright.typemapper.configuration.TypeMapperConfiguration;
+import com.stephenenright.typemapper.TypeMapperConfiguration;
+import com.stephenenright.typemapper.internal.TypeMappingContextImpl;
 import com.stephenenright.typemapper.internal.TypeMappingService;
 import com.stephenenright.typemapper.internal.collection.ConcurrentReferenceHashMap;
 
@@ -21,7 +22,7 @@ public class TypeMappingInfoRegistryImpl implements TypeMappingInfoRegistry {
     @SuppressWarnings("unchecked")
     @Override
     public <S, D> TypeMappingInfo<S, D> getOrRegister(S source, Class<S> sourceType, Class<D> destinationType,
-            TypeMappingService mappingService, TypeMapperConfiguration configuration) {
+            TypeMappingService mappingService, TypeMappingContextImpl<S, D> contextImpl) {
         TypeMappingKey<S, D> key = new TypeMappingKey<S, D>(sourceType, destinationType);
         TypeMappingInfo<S, D> mappingInfo = (TypeMappingInfo<S, D>) typeMappingInfoCache.get(key);
         
@@ -29,8 +30,8 @@ public class TypeMappingInfoRegistryImpl implements TypeMappingInfoRegistry {
             return mappingInfo;
         }
         
-        mappingInfo = new TypeMappingInfoImpl<S, D>(sourceType, destinationType, configuration);
-        typeMappingBuilder.buildMappings(source, mappingInfo, configuration, this);
+        mappingInfo = new TypeMappingInfoImpl<S, D>(sourceType, destinationType, contextImpl.getConfiguration());
+        typeMappingBuilder.buildMappings(source, mappingInfo, contextImpl, this);
         typeMappingInfoCache.put(key, mappingInfo);
   
         return mappingInfo;

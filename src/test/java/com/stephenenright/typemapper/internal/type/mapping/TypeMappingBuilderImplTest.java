@@ -10,6 +10,9 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.stephenenright.typemapper.TypeMapperConfiguration;
+import com.stephenenright.typemapper.internal.TypeMappingContextImpl;
+import com.stephenenright.typemapper.internal.TypeMappingService;
 import com.stephenenright.typemapper.test.dto.vending.PaymentProcessorDto;
 import com.stephenenright.typemapper.test.dto.vending.VendingMachineDto;
 import com.stephenenright.typemapper.test.fixture.utils.FixtureUtils;
@@ -18,14 +21,15 @@ import com.stephenenright.typemapper.test.models.vending.VendingMachine;
 
 public class TypeMappingBuilderImplTest {
 
+    private TypeMappingService mappingService;
     private TypeMappingBuilder builder;
     private TypeMappingInfoRegistry mappingInfoRegistry;
 
     @Before
     public void setup() {
-        builder = new TypeMappingBuilderImpl(FixtureUtils.createTypeInfoRegistry(),
-                FixtureUtils.createDefaultConverterRegistry());
+        builder = new TypeMappingBuilderImpl(FixtureUtils.createTypeInfoRegistry());
         mappingInfoRegistry = FixtureUtils.createTypeMappingInfoRegistry(FixtureUtils.createTypeInfoRegistry());
+        mappingService = FixtureUtils.createDefaultMappingService();
     }
 
     @Test
@@ -38,10 +42,14 @@ public class TypeMappingBuilderImplTest {
         expectedMappings.put("PaymentProcessor.gateway.name", "PaymentProcessorDto.gateway.name");
         expectedMappings.put("PaymentProcessor.gateway.id", "PaymentProcessorDto.gateway.id");
 
-        TypeMappingInfo<PaymentProcessor, PaymentProcessorDto> mappingInfo = FixtureUtils
-                .createDefaultTypeMappingInfo(PaymentProcessor.class, PaymentProcessorDto.class);
+        TypeMapperConfiguration configuration = TypeMapperConfiguration.create();
         PaymentProcessor sourceObject = new PaymentProcessor();
-        builder.buildMappings(sourceObject, mappingInfo, mappingInfo.getConfiguration(), mappingInfoRegistry);
+        TypeMappingContextImpl<PaymentProcessor, PaymentProcessorDto> contextImpl = 
+                new TypeMappingContextImpl<>(configuration, sourceObject, PaymentProcessorDto.class, mappingService);
+        
+        TypeMappingInfo<PaymentProcessor, PaymentProcessorDto> mappingInfo = FixtureUtils
+                .createDefaultTypeMappingInfo(PaymentProcessor.class, PaymentProcessorDto.class, configuration);
+        builder.buildMappings(sourceObject, mappingInfo, contextImpl, mappingInfoRegistry);
 
         List<TypeMapping> mappingsList = mappingInfo.getTypeMappings();
 
@@ -64,6 +72,7 @@ public class TypeMappingBuilderImplTest {
         expectedMappings.put("VendingMachine.slots", "VendingMachineDto.slots");
         expectedMappings.put("VendingMachine.deleted", "VendingMachineDto.deleted");
         expectedMappings.put("VendingMachine.name", "VendingMachineDto.name");
+        expectedMappings.put("VendingMachine.configuration", "VendingMachineDto.configuration");
         expectedMappings.put("VendingMachine.status", "VendingMachineDto.status");
         expectedMappings.put("VendingMachine.processor.gateway", "VendingMachineDto.processor.gateway");
         expectedMappings.put("VendingMachine.processor.deleted", "VendingMachineDto.processor.deleted");
@@ -76,13 +85,14 @@ public class TypeMappingBuilderImplTest {
         
         
         
-        
-        
+        VendingMachine vendingMachine = new VendingMachine();
+        TypeMappingContextImpl<VendingMachine,VendingMachineDto> contextImpl2 = 
+                new TypeMappingContextImpl<>(configuration, vendingMachine, VendingMachineDto.class, mappingService);
        
         TypeMappingInfo<VendingMachine, VendingMachineDto> mappingInfo2 = FixtureUtils
                 .createDefaultTypeMappingInfo(VendingMachine.class, VendingMachineDto.class);
-        VendingMachine vendingMachine = new VendingMachine();
-        builder.buildMappings(vendingMachine, mappingInfo2, mappingInfo2.getConfiguration(), mappingInfoRegistry);
+       
+        builder.buildMappings(vendingMachine, mappingInfo2, contextImpl2, mappingInfoRegistry);
 
         mappingsList = mappingInfo2.getTypeMappings();
         
@@ -93,14 +103,10 @@ public class TypeMappingBuilderImplTest {
         for (TypeMapping mapping : mappingsList) {
             String destinationPath = expectedMappings.get(mapping.getSourcePath());
 
+            
             if (destinationPath.equals(mapping.getDestinationPath())) {
                 expectedMappings.remove(mapping.getSourcePath());
             }
         }
-        
-        
-        
-        
     }
-
 }

@@ -1,6 +1,6 @@
 package com.stephenenright.typemapper.internal.type.info;
 
-import com.stephenenright.typemapper.configuration.TypeMapperConfiguration;
+import com.stephenenright.typemapper.TypeMapperConfiguration;
 
 public interface TypeInfoCreator {
 

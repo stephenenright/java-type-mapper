@@ -2,7 +2,7 @@ package com.stephenenright.typemapper.test.fixture.utils;
 
 import java.util.Arrays;
 
-import com.stephenenright.typemapper.configuration.TypeMapperConfiguration;
+import com.stephenenright.typemapper.TypeMapperConfiguration;
 import com.stephenenright.typemapper.internal.TypeMappingContextImpl;
 import com.stephenenright.typemapper.internal.TypeMappingServiceImpl;
 import com.stephenenright.typemapper.internal.conversion.TypeConverterCollectionDefaultImpl;
@@ -52,7 +52,7 @@ public abstract class FixtureUtils {
 
     public static TypeMappingInfoRegistryImpl createTypeMappingInfoRegistry(TypeInfoRegistry typeInfoRegistry) {
         return new TypeMappingInfoRegistryImpl(
-                new TypeMappingBuilderImpl(typeInfoRegistry, createDefaultConverterRegistry()));
+                new TypeMappingBuilderImpl(typeInfoRegistry));
     }
 
     public static <S, D> TypeMappingInfo<S, D> createDefaultTypeMappingInfo(Class<S> sourceType,
@@ -63,4 +63,15 @@ public abstract class FixtureUtils {
 
         return mappingInfo;
     }
+    
+    
+    public static <S, D> TypeMappingInfo<S, D> createDefaultTypeMappingInfo(Class<S> sourceType,
+            Class<D> destinationType,TypeMapperConfiguration configuration) {
+        TypeMappingInfoImpl<S, D> mappingInfo = new TypeMappingInfoImpl<S, D>(sourceType, destinationType,
+                configuration);
+
+        return mappingInfo;
+    }
+    
+    
 }

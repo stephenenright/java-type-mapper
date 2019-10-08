@@ -2,7 +2,7 @@ package com.stephenenright.typemapper.internal.type.mapping;
 
 import java.util.List;
 
-import com.stephenenright.typemapper.configuration.TypeMapperConfiguration;
+import com.stephenenright.typemapper.TypeMapperConfiguration;
 import com.stephenenright.typemapper.converter.TypeConverter;
 
 public interface TypeMappingInfo<S, D> {

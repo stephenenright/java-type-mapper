@@ -1,8 +1,10 @@
-package com.stephenenright.typemapper.configuration;
+package com.stephenenright.typemapper;
 
-import com.stephenenright.typemapper.TypeIntrospector;
 import com.stephenenright.typemapper.internal.configuration.TypeMapperConfigurationImpl;
 
+/**
+ * Configuration used to to configure an individual type mapping
+ */
 public interface TypeMapperConfiguration {
 
     /**
@@ -45,5 +47,4 @@ public interface TypeMapperConfiguration {
     public static TypeMapperConfiguration create() {
         return new TypeMapperConfigurationImpl();
     }
-
 }

@@ -139,4 +139,10 @@ public class TypeConverterCollectionImpl implements TypeConverterCollection {
     private void clearCache() {
         convertersCache.clear();
     }
+
+    @Override
+    public boolean isEmpty() {
+        return convertersMap.isEmpty();
+    }
+
 }

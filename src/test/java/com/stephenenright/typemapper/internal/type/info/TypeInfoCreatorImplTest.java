@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.stephenenright.typemapper.TypeIntrospector;
-import com.stephenenright.typemapper.configuration.TypeMapperConfiguration;
+import com.stephenenright.typemapper.TypeMapperConfiguration;
 import com.stephenenright.typemapper.test.models.vending.PaymentProcessor;
 import com.stephenenright.typemapper.test.models.vending.VendingMachine;
 import com.stephenenright.typemapper.test.models.vending.VendingMachineStatus;

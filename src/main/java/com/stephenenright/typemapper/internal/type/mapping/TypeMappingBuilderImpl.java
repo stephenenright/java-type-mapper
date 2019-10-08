@@ -4,12 +4,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 
-import com.stephenenright.typemapper.configuration.TypeMapperConfiguration;
-import com.stephenenright.typemapper.converter.TypeConverter;
+import com.stephenenright.typemapper.TypeMapperConfiguration;
 import com.stephenenright.typemapper.converter.TypeConditionalConverter;
 import com.stephenenright.typemapper.converter.TypeConditionalConverter.MatchResult;
+import com.stephenenright.typemapper.converter.TypeConverter;
+import com.stephenenright.typemapper.internal.TypeMappingContextImpl;
 import com.stephenenright.typemapper.internal.collection.Stack;
-import com.stephenenright.typemapper.internal.conversion.TypeConverterRegistry;
 import com.stephenenright.typemapper.internal.type.info.TypeInfo;
 import com.stephenenright.typemapper.internal.type.info.TypeInfoRegistry;
 import com.stephenenright.typemapper.internal.type.info.TypePropertyGetter;
@@ -19,25 +19,23 @@ import com.stephenenright.typemapper.internal.util.JavaBeanUtils;
 public class TypeMappingBuilderImpl implements TypeMappingBuilder {
 
     private final TypeInfoRegistry typeInfoRegistry;
-    private final TypeConverterRegistry typeConverterRegistry;
 
-    public TypeMappingBuilderImpl(TypeInfoRegistry typeInfoRegistry, TypeConverterRegistry typeConverterRegistry) {
+    public TypeMappingBuilderImpl(TypeInfoRegistry typeInfoRegistry) {
         this.typeInfoRegistry = typeInfoRegistry;
-        this.typeConverterRegistry = typeConverterRegistry;
     }
 
     @Override
     public <S, D> void buildMappings(S source, TypeMappingInfo<S, D> typeMappingInfo,
-            TypeMapperConfiguration configuration, TypeMappingInfoRegistry typeMappingInfoRegistry) {
+            TypeMappingContextImpl<S, D> contextImpl, TypeMappingInfoRegistry typeMappingInfoRegistry) {
 
         PropertyMappingPath mappingPath = new PropertyMappingPath();
-        final TypeInfo<S> sourceTypeInfo = typeInfoRegistry.get(typeMappingInfo.getSourceType(), configuration);
+        final TypeInfo<S> sourceTypeInfo = typeInfoRegistry.get(typeMappingInfo.getSourceType(), contextImpl.getConfiguration());
 
         TypeMappingBuilderContext<?, ?> context = new TypeMappingBuilderContext<S, D>(typeMappingInfo, mappingPath,
-                sourceTypeInfo, configuration, typeMappingInfoRegistry);
+                sourceTypeInfo, contextImpl, typeMappingInfoRegistry);
 
         context.sourceTypeInfoPush(sourceTypeInfo);
-        mapDestination(typeInfoRegistry.get(typeMappingInfo.getDestinationType(), configuration), context);
+        mapDestination(typeInfoRegistry.get(typeMappingInfo.getDestinationType(), contextImpl.getConfiguration()), context);
     }
 
     private void mapDestination(TypeInfo<?> destinationTypeInfo, TypeMappingBuilderContext<?, ?> context) {
@@ -79,7 +77,7 @@ public class TypeMappingBuilderImpl implements TypeMappingBuilder {
                 matched = true;
             } else {
                 // we know a mapping exists from dest to source so check if its viable
-                TypeConverter<?, ?> converter = typeConverterRegistry.getConverter(sourceGetter.getType(),
+                TypeConverter<?, ?> converter =  context.getMappingContextImpl().getTypeConverter(sourceGetter.getType(),
                         destinationSetter.getType());
 
                 if (converter != null) {
@@ -125,20 +123,22 @@ public class TypeMappingBuilderImpl implements TypeMappingBuilder {
         private final TypeMappingInfo<S, D> typeMappingInfo;
         private final PropertyMappingPath propertyMappingPath;
         private final TypeInfo<?> rootSourceTypeInfo;
-        private final TypeMapperConfiguration configuration;
         private final List<TypeMapping> mappings = new LinkedList<>();
         private Stack<TypeInfo<?>> sourceTypeInfoStack = new Stack<>();
         private final TypeMappingInfoRegistry typeMappingInfoRegistry;
+        private TypeMappingContextImpl<S, D> typeMappingContextImpl;
+        
+        
 
         public TypeMappingBuilderContext(TypeMappingInfo<S, D> typeMappingInfo, PropertyMappingPath propertyMappingPath,
-                TypeInfo<?> rootSourceTypeInfo, TypeMapperConfiguration configuration,
+                TypeInfo<?> rootSourceTypeInfo, TypeMappingContextImpl<S, D> contextImpl,
                 TypeMappingInfoRegistry typeMappingInfoRegistry) {
             this.typeMappingInfo = typeMappingInfo;
             this.propertyMappingPath = propertyMappingPath;
             this.rootSourceTypeInfo = rootSourceTypeInfo;
-            this.configuration = configuration;
             sourceTypeInfoStack.push(rootSourceTypeInfo);
             this.typeMappingInfoRegistry = typeMappingInfoRegistry;
+            this.typeMappingContextImpl = contextImpl;
 
         }
 
@@ -151,7 +151,11 @@ public class TypeMappingBuilderImpl implements TypeMappingBuilder {
         }
 
         public TypeMapperConfiguration getConfiguration() {
-            return configuration;
+            return typeMappingContextImpl.getConfiguration();
+        }
+        
+        public TypeMappingContextImpl<S, D> getMappingContextImpl() {
+            return typeMappingContextImpl;
         }
 
         public void addMapping(TypeMapping mapping) {

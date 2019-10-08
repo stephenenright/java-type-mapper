@@ -1,4 +1,4 @@
-package com.stephenenright.typemapper.configuration;
+package com.stephenenright.typemapper;
 
 public enum TypeAccessLevel {
     
