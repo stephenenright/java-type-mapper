@@ -1,5 +1,7 @@
 package com.stephenenright.typemapper;
 
+import com.stephenenright.typemapper.converter.TypeConverter;
+import com.stephenenright.typemapper.converter.TypeConverterFactory;
 import com.stephenenright.typemapper.internal.configuration.TypeMapperConfigurationImpl;
 
 /**
@@ -26,23 +28,19 @@ public interface TypeMapperConfiguration {
     public void setAccessLevel(TypeAccessLevel accessLevel);
 
     /**
-     * Returns the introspection store used to look up type information
-     * 
-     * @return the introspection store
+     * Add a type converter
      */
-    public TypeIntrospector getIntrospector();
+    public <S, D> void addTypeConverter(TypeConverter<S, D> typeConverter);
 
     /**
-     * Allows the introspector to be set. This is useful if you want to reuse
-     * an instrospector cache, for example if the spring framework is being used etc.
-     * 
-     * @param introspector the introspector to set
+     * Add a type converter factory
      */
-    public void setIntrospector(TypeIntrospector introspector);
+    public <S, D> void addTypeConverterFactory(TypeConverterFactory<S, D> factory);
 
     /**
      * Create a new configuration instance
-     * @return  the configuration instance
+     * 
+     * @return the configuration instance
      */
     public static TypeMapperConfiguration create() {
         return new TypeMapperConfigurationImpl();

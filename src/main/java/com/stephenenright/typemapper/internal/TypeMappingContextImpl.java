@@ -9,14 +9,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import javax.annotation.Nullable;
-
 import com.stephenenright.typemapper.TypeMapperConfiguration;
-import com.stephenenright.typemapper.TypeMappingConfiguration;
 import com.stephenenright.typemapper.TypeMappingContext;
 import com.stephenenright.typemapper.TypeToken;
 import com.stephenenright.typemapper.converter.TypeConverter;
 import com.stephenenright.typemapper.internal.common.CommonConstants;
+import com.stephenenright.typemapper.internal.configuration.TypeMapperConfigurationImpl;
 import com.stephenenright.typemapper.internal.type.info.TypeInfoRegistry;
 import com.stephenenright.typemapper.internal.type.info.TypePropertyGetter;
 import com.stephenenright.typemapper.internal.type.info.TypePropertySetter;
@@ -39,7 +37,7 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
     private final Type genericDestinationType;
     private final TypeMappingService mappingService;
     private TypeMapping mapping;
-    private final TypeMapperConfiguration configuration;
+    private final TypeMapperConfigurationImpl configuration;
     private final List<String> processedPaths;
     private final String destinationPath;
     private TypeMappingContextImpl<?, ?> parent;
@@ -53,10 +51,11 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
 
     public TypeMappingContextImpl(TypeMapperConfiguration configuration, S source, Class<S> sourceType, D destination,
             Class<D> destinationType, Type genericDestinationType, TypeMappingService mappingService) {
-
+        AssertUtils.notNull(configuration, "Configuration cannot be null");
+        
         this.parent = null;
         this.destinationPath = CommonConstants.EMPTY_STRING;
-        this.configuration = configuration;
+        this.configuration = (TypeMapperConfigurationImpl) configuration;
         this.source = source;
         this.sourceType = sourceType;
         this.destination = destination;
@@ -91,8 +90,9 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
     public TypeMappingContextImpl(TypeMappingContext<?, ?> context, S source, Class<S> sourceType, D destination,
             Class<D> destinationType, Type genericDestinationType, TypeMapping mapping, boolean inherit) {
         TypeMappingContextImpl<?, ?> contextImpl = (TypeMappingContextImpl<?, ?>) context;
+
         this.parent = contextImpl;
-        this.configuration = context.getConfiguration();
+        this.configuration = (TypeMapperConfigurationImpl) context.getConfiguration();
         this.source = source;
         this.sourceType = sourceType;
         this.destination = destination;
@@ -288,6 +288,12 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
 
     @SuppressWarnings("hiding")
     public <S, D> TypeConverter<S, D> getTypeConverter(Class<S> sourceType, Class<D> destinationType) {
+        TypeConverter<S, D> foundConverter = configuration.getTypeConverter(sourceType, destinationType);
+        
+        if(foundConverter!=null) {
+            return foundConverter;
+        }
+
         return mappingService.getTypeConverter(sourceType, destinationType);
     }
 
