@@ -12,7 +12,11 @@ public class MapUtils {
     private MapUtils() {
 
     }
-
+    
+    public static boolean isMap(Class<?> cls) {
+        return Map.class.isAssignableFrom(cls);
+    }
+    
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static Map<Object, Object> createForContext(TypeMappingContext<Map, Map> context) {
         if (!context.getDestinationType().isInterface()) {
@@ -29,5 +33,4 @@ public class MapUtils {
 
         return new HashMap<Object, Object>();
     }
-
 }

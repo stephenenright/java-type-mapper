@@ -99,4 +99,32 @@ public abstract class StringUtils {
         return builder.toString();
     }
 
+    public static String joinStrings(String sep, List<String> strs, int toIndex) {
+        if (strs.size() == 0) {
+            return CommonConstants.EMPTY_STRING;
+        }
+
+        StringBuilder builder = new StringBuilder();
+        int i = 0;
+        for (String str : strs) {
+            if (i >= toIndex) {
+                break;
+            }
+
+            if (isNullOrEmpty(str)) {
+                continue;
+            }
+
+            if (builder.length() > 0) {
+                builder.append(sep);
+            }
+
+            builder.append(str);
+
+            i++;
+        }
+
+        return builder.toString();
+    }
+
 }

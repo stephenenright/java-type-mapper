@@ -1,8 +1,8 @@
 package com.stephenenright.typemapper.internal.collection;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
-public class Stack<T> extends LinkedList<T> {
+public class Stack<T> extends ArrayList<T> {
 
     private static final long serialVersionUID = -1624894899104902593L;
 

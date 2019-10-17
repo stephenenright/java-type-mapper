@@ -49,7 +49,10 @@ public class Errors {
                 type.getName());
 
         return addError(new ErrorDetail(message, t));
+    }
 
+    public Errors errorMappingSourceToMap(String message) {
+        return addError(new ErrorDetail(message, null));
     }
 
     public Errors errorGenericMapping(Class<?> sourceType, Class<?> destinationType, Throwable t) {

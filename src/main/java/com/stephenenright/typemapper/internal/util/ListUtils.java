@@ -4,8 +4,8 @@ import java.util.List;
 
 public abstract class ListUtils {
 
-    private ListUtils() {
-
+    public static boolean isList(Object type) {
+        return type instanceof List;
     }
 
     public static <E> E getLastElement(List<E> list) {

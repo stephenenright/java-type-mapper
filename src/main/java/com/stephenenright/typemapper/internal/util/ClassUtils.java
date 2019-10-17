@@ -1,5 +1,6 @@
 package com.stephenenright.typemapper.internal.util;
 
+import java.time.temporal.Temporal;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
@@ -42,6 +43,11 @@ public abstract class ClassUtils {
 
     }
 
+    public static boolean isTemporalType(Class<?> type) {
+        return Temporal.class.isAssignableFrom(type);
+
+    }
+
     public static boolean isPrimitive(Class<?> clazz) {
         return clazz.isPrimitive() || isPrimitiveWrapper(clazz);
     }
@@ -58,7 +64,7 @@ public abstract class ClassUtils {
     }
 
     public static boolean isPrimitiveWrapper(Class<?> clazz) {
-        return primitiveToWrapperTypeMap.containsKey(clazz);
+        return primitiveWrapperToPrimitiveTypeMap.containsKey(clazz);
 
     }
 

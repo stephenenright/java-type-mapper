@@ -11,8 +11,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.stephenenright.typemapper.TypeMapperConfiguration;
+import com.stephenenright.typemapper.TypeMappingService;
 import com.stephenenright.typemapper.internal.TypeMappingContextImpl;
-import com.stephenenright.typemapper.internal.TypeMappingService;
+import com.stephenenright.typemapper.internal.TypeMappingToStrategy;
 import com.stephenenright.typemapper.test.dto.vending.PaymentProcessorDto;
 import com.stephenenright.typemapper.test.dto.vending.VendingMachineDto;
 import com.stephenenright.typemapper.test.fixture.utils.FixtureUtils;
@@ -45,7 +46,7 @@ public class TypeMappingBuilderImplTest {
         TypeMapperConfiguration configuration = TypeMapperConfiguration.create();
         PaymentProcessor sourceObject = new PaymentProcessor();
         TypeMappingContextImpl<PaymentProcessor, PaymentProcessorDto> contextImpl = 
-                new TypeMappingContextImpl<>(configuration, sourceObject, PaymentProcessorDto.class, mappingService);
+                new TypeMappingContextImpl<>(configuration, sourceObject, PaymentProcessorDto.class, mappingService, TypeMappingToStrategy.OBJECT);
         
         TypeMappingInfo<PaymentProcessor, PaymentProcessorDto> mappingInfo = FixtureUtils
                 .createDefaultTypeMappingInfo(PaymentProcessor.class, PaymentProcessorDto.class, configuration);
@@ -87,7 +88,7 @@ public class TypeMappingBuilderImplTest {
         
         VendingMachine vendingMachine = new VendingMachine();
         TypeMappingContextImpl<VendingMachine,VendingMachineDto> contextImpl2 = 
-                new TypeMappingContextImpl<>(configuration, vendingMachine, VendingMachineDto.class, mappingService);
+                new TypeMappingContextImpl<>(configuration, vendingMachine, VendingMachineDto.class, mappingService, TypeMappingToStrategy.OBJECT);
        
         TypeMappingInfo<VendingMachine, VendingMachineDto> mappingInfo2 = FixtureUtils
                 .createDefaultTypeMappingInfo(VendingMachine.class, VendingMachineDto.class);

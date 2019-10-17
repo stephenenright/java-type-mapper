@@ -2,9 +2,8 @@ package com.stephenenright.typemapper.internal.type.mapping;
 
 import java.util.Map;
 
-import com.stephenenright.typemapper.TypeMapperConfiguration;
+import com.stephenenright.typemapper.TypeMappingService;
 import com.stephenenright.typemapper.internal.TypeMappingContextImpl;
-import com.stephenenright.typemapper.internal.TypeMappingService;
 import com.stephenenright.typemapper.internal.collection.ConcurrentReferenceHashMap;
 
 public class TypeMappingInfoRegistryImpl implements TypeMappingInfoRegistry {
@@ -18,6 +17,7 @@ public class TypeMappingInfoRegistryImpl implements TypeMappingInfoRegistry {
         this.typeMappingBuilder = typeMappingBuilder;
     }
     
+
     
     @SuppressWarnings("unchecked")
     @Override
@@ -36,7 +36,6 @@ public class TypeMappingInfoRegistryImpl implements TypeMappingInfoRegistry {
   
         return mappingInfo;
     }
-
 
     @SuppressWarnings("unchecked")
     @Override

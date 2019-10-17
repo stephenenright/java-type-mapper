@@ -2,7 +2,6 @@ package com.stephenenright.typemapper;
 
 import java.lang.reflect.Type;
 
-import com.stephenenright.typemapper.internal.TypeMappingService;
 import com.stephenenright.typemapper.internal.type.mapping.TypeMapping;
 
 public interface TypeMappingContext<S, D> {

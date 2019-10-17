@@ -2,11 +2,13 @@ package com.stephenenright.typemapper.internal.util;
 
 import java.lang.reflect.Method;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
+
+import com.stephenenright.typemapper.TypeMapperConfiguration;
+import com.stephenenright.typemapper.internal.type.info.TypeInfo;
+import com.stephenenright.typemapper.internal.type.info.TypeInfoRegistry;
 
 public abstract class JavaBeanUtils {
 
@@ -72,11 +74,29 @@ public abstract class JavaBeanUtils {
             throw new IllegalStateException("Method name is not a valid getter");
         }
     }
-
+    
+    
     public static boolean isPossibleJavaBean(Class<?> type) {
         return type != Object.class && type != String.class && type != UUID.class && type != LocalDate.class
-                && type != LocalDateTime.class && type != ZonedDateTime.class && type != Date.class
-                && type != Calendar.class && !ClassUtils.isPrimitive(type) && !IterableUtils.isIterable(type);
+                && !ClassUtils.isTemporalType(type) && type != Date.class
+                && type != Calendar.class && !ClassUtils.isPrimitive(type) && !IterableUtils.isIterable(type)
+                && !MapUtils.isMap(type);
+    }
+    
+    
+    
+    public static boolean isPossibleJavaBean(Class<?> type, TypeInfoRegistry typeInfoRegistry, TypeMapperConfiguration configuration) {
+        boolean isPossibleBean = isPossibleJavaBean(type);
+        
+        if(isPossibleBean) {
+            TypeInfo<?> typeInfo = typeInfoRegistry.get(type, configuration);
+            
+            if(typeInfo!=null) {
+                return !typeInfo.getPropertyGetters().isEmpty() || !typeInfo.getPropertySetters().isEmpty();
+            }
+        }
+        
+        return false;
     }
 
 }

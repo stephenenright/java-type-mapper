@@ -1,7 +1,7 @@
 package com.stephenenright.typemapper.internal.type.mapping;
 
+import com.stephenenright.typemapper.TypeMappingService;
 import com.stephenenright.typemapper.internal.TypeMappingContextImpl;
-import com.stephenenright.typemapper.internal.TypeMappingService;
 
 public interface TypeMappingInfoRegistry {
 

@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 
 import com.stephenenright.typemapper.TypeMapperConfiguration;
 import com.stephenenright.typemapper.TypeMappingContext;
+import com.stephenenright.typemapper.TypeMappingService;
 import com.stephenenright.typemapper.TypeToken;
 import com.stephenenright.typemapper.converter.TypeConverter;
 import com.stephenenright.typemapper.internal.common.CommonConstants;
@@ -42,17 +43,20 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
     private final String destinationPath;
     private TypeMappingContextImpl<?, ?> parent;
     private boolean providedDestination;
+    private final TypeMappingToStrategy strategy;
 
+    
     public TypeMappingContextImpl(TypeMapperConfiguration configuration, S source, Class<D> destinationType,
-            TypeMappingService mappingService) {
+            TypeMappingService mappingService, TypeMappingToStrategy strategy) {
         this(configuration, source, ProxyUtils.unProxy(source.getClass()), null, destinationType,
-                TypeToken.<D>of(destinationType).getType(), mappingService);
+                TypeToken.<D>of(destinationType).getType(), mappingService, strategy);
     }
 
     public TypeMappingContextImpl(TypeMapperConfiguration configuration, S source, Class<S> sourceType, D destination,
-            Class<D> destinationType, Type genericDestinationType, TypeMappingService mappingService) {
+            Class<D> destinationType, Type genericDestinationType, TypeMappingService mappingService, TypeMappingToStrategy strategy) {
         AssertUtils.notNull(configuration, "Configuration cannot be null");
         
+        this.strategy = strategy;
         this.parent = null;
         this.destinationPath = CommonConstants.EMPTY_STRING;
         this.configuration = (TypeMapperConfigurationImpl) configuration;
@@ -92,6 +96,7 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
         TypeMappingContextImpl<?, ?> contextImpl = (TypeMappingContextImpl<?, ?>) context;
 
         this.parent = contextImpl;
+        this.strategy = parent.getTypeMappingToStrategy();
         this.configuration = (TypeMapperConfigurationImpl) context.getConfiguration();
         this.source = source;
         this.sourceType = sourceType;
@@ -305,4 +310,7 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
         destinationCache.put(path, destination);
     }
 
+    public TypeMappingToStrategy getTypeMappingToStrategy() {
+        return strategy;
+    }
 }

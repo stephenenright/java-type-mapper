@@ -4,8 +4,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.stephenenright.typemapper.TypeMappingConfiguration;
-import com.stephenenright.typemapper.internal.TypeMappingService;
+import com.stephenenright.typemapper.TypeMappingService;
+import com.stephenenright.typemapper.internal.TypeMappingConversionStrategy;
+import com.stephenenright.typemapper.internal.TypeMappingConversionStrategyMapImpl;
+import com.stephenenright.typemapper.internal.TypeMappingConversionStrategyObjectImpl;
+import com.stephenenright.typemapper.internal.TypeMappingConversionStrategyRegistry;
 import com.stephenenright.typemapper.internal.TypeMappingServiceImpl;
+import com.stephenenright.typemapper.internal.TypeMappingToStrategy;
 import com.stephenenright.typemapper.internal.conversion.TypeConverterCollectionDefaultImpl;
 import com.stephenenright.typemapper.internal.conversion.TypeConverterRegistry;
 import com.stephenenright.typemapper.internal.conversion.TypeConverterRegistryImpl;
@@ -25,10 +30,11 @@ import com.stephenenright.typemapper.internal.type.mapping.TypeMappingInfoRegist
 public abstract class TypeMappingServiceConfiguer {
 
     private TypeMappingServiceConfiguer() {
-
+        
     }
-
+    
     public static TypeMappingService configure(TypeMappingConfiguration configuration) {
+
         TypeMappingConfigurationImpl configurationImpl = (TypeMappingConfigurationImpl) configuration;
 
         TypePropertyInfoCollector typePropertyInfoCollector = new TypePropertyInfoCollectorImpl(
@@ -51,10 +57,17 @@ public abstract class TypeMappingServiceConfiguer {
         }
 
         converterRegistryList.add(new TypeConverterRegistryImpl(new TypeConverterCollectionDefaultImpl()));
-        TypeMappingService service = new TypeMappingServiceImpl(converterRegistryList, mappingInfoRegistry,
+
+        TypeMappingConversionStrategyRegistry conversionStrategyRegistry = new TypeMappingConversionStrategyRegistry();
+        TypeMappingConversionStrategy objectStrategy = new TypeMappingConversionStrategyObjectImpl(mappingInfoRegistry,
                 typeInfoRegistry, typePropertyInfoRegistry);
+        TypeMappingConversionStrategy mapStrategy = new TypeMappingConversionStrategyMapImpl(typeInfoRegistry);
+      
+        conversionStrategyRegistry.register(TypeMappingToStrategy.OBJECT, objectStrategy);
+        conversionStrategyRegistry.register(TypeMappingToStrategy.MAP,  mapStrategy);
+        
+        TypeMappingService service = new TypeMappingServiceImpl(converterRegistryList, conversionStrategyRegistry);
 
         return service;
     }
-
 }

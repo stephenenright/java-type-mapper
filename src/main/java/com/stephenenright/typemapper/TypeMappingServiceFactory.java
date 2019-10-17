@@ -1,6 +1,5 @@
 package com.stephenenright.typemapper;
 
-import com.stephenenright.typemapper.internal.TypeMappingService;
 import com.stephenenright.typemapper.internal.configuration.TypeMappingServiceConfiguer;
 
 public abstract class TypeMappingServiceFactory {
