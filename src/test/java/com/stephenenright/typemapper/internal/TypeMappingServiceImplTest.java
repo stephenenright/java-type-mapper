@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -97,7 +98,7 @@ public class TypeMappingServiceImplTest {
 
     @Test
     public void map() {
-        VendingMachine machine = createVendingMachine();
+        VendingMachine machine = createVendingMachine("V1", "Vending Machine 1");
 
         VendingMachineDto result = mappingService.map(machine, VendingMachineDto.class);
         assertNotNull(result);
@@ -183,7 +184,7 @@ public class TypeMappingServiceImplTest {
     @SuppressWarnings("unchecked")
     @Test
     public void mapToMap_Bean() {
-        VendingMachine machine = createVendingMachine();
+        VendingMachine machine = createVendingMachine("V1", "Vending Machine 1");
 
         List<Object> buttons = new LinkedList<Object>();
         List<Object> buttonsWarnings = new LinkedList<Object>();
@@ -278,7 +279,125 @@ public class TypeMappingServiceImplTest {
         }
     }
 
-    private VendingMachine createVendingMachine() {
+    @SuppressWarnings("unchecked")
+    @Test
+    public void mapToListOfMap_Bean() {
+
+        List<VendingMachine> machineList = new ArrayList<VendingMachine>();
+
+        for (int i = 0; i < 10; i++) {
+            VendingMachine machine = createVendingMachine("V" + String.valueOf(i), "Vending Machine " + String.valueOf(i));
+            List<Object> buttons = new LinkedList<Object>();
+            List<Object> buttonsWarnings = new LinkedList<Object>();
+            Map<String, Object> warningButton = new HashMap<>();
+            warningButton.put("name", "warnButton1");
+            buttonsWarnings.add(warningButton);
+            buttons.add(buttonsWarnings);
+            buttons.add("on button");
+            machine.getConfiguration().put("buttons", buttons);
+            machineList.add(machine);
+        }
+
+       
+        List<Map<String, Object>> resultList = mappingService.mapToListOfMap(machineList);
+        assertTrue(resultList.size() == 10);
+        
+        
+        for(int z=0; z<10; z++) {
+            Map<String, Object> result = resultList.get(z);
+            
+            assertEquals("V" + String.valueOf(z), result.get("id"));
+            assertEquals("Vending Machine " + String.valueOf(z), result.get("name"));
+            assertEquals(true, result.get("deleted"));
+
+            Map<String, Object> configuration = (Map<String, Object>) result.get("configuration");
+            assertTrue((Boolean) configuration.get("shutdownWhenEmpty"));
+            assertFalse((Boolean) configuration.get("exactAmountRequired"));
+
+            List<Object> resultButtons = (List<Object>) configuration.get("buttons");
+            assertTrue(resultButtons.size() == 2);
+
+            List<Object> resultWarningButtons = (List<Object>) resultButtons.get(0);
+            assertTrue(resultWarningButtons.size() == 1);
+            Map<String, Object> warningButton1 = (Map<String, Object>) resultWarningButtons.get(0);
+            assertEquals("warnButton1", warningButton1.get("name"));
+
+            String onButton = (String) resultButtons.get(1);
+            assertEquals("on button", onButton);
+
+            Map<String, Object> processor = (Map<String, Object>) result.get("processor");
+            assertEquals("P1", processor.get("id"));
+            assertEquals("PRO Name 1", processor.get("name"));
+            assertEquals(false, processor.get("deleted"));
+
+            Map<String, Object> gateway = (Map<String, Object>) processor.get("gateway");
+            assertNotNull(gateway);
+            assertEquals("Gateway 1", gateway.get("id"));
+            assertEquals(false, gateway.get("deleted"));
+
+            List<Object> slots = (List<Object>) result.get("slots");
+            assertNotNull(slots);
+            assertTrue(slots.size() == 10);
+
+            for (int i = 0, j = 1; i < 10; i++, j++) {
+                Map<String, Object> slot = (Map<String, Object>) slots.get(i);
+                assertEquals(false, slot.get("deleted"));
+                assertEquals(String.valueOf(j), slot.get("id"));
+                assertEquals(String.valueOf(j), slot.get("code"));
+                assertEquals(Double.valueOf(String.valueOf(j) + ".00"), slot.get("price"));
+
+                List<Map<String, Object>> products = (List<Map<String, Object>>) slot.get("products");
+                assertNotNull(products);
+                assertEquals(2, products.size());
+
+                Set<String> expectedProductIds = new HashSet<String>();
+                expectedProductIds.add("1");
+
+                for (Map<String, Object> slotProduct : products) {
+                    Map<String, Object> slotProductId = (Map<String, Object>) slotProduct.get("id");
+                    assertEquals(slot.get("id"), slotProductId.get("slotId"));
+
+                    if (expectedProductIds.contains(slotProductId.get("productId"))) {
+                        expectedProductIds.remove(slotProductId.get("productId"));
+                    }
+
+                    Map<String, Object> slotFromRel = (Map<String, Object>) slotProduct.get("slot");
+
+                    assertNotNull(slotFromRel);
+                    assertEquals(String.valueOf(j), slotFromRel.get("id"));
+
+                    Map<String, Object> productFromRel = (Map<String, Object>) slotProduct.get("product");
+                    assertNotNull(productFromRel);
+
+                    if (productFromRel.get("id").equals("1")) {
+                        assertEquals("Product 1", productFromRel.get("name"));
+
+                    } else if (productFromRel.get("id").equals("2")) {
+                        assertEquals("Product 2", productFromRel.get("name"));
+                    }
+
+                    Map<String, Object> category = (Map<String, Object>) productFromRel.get("category");
+                    assertEquals("1", category.get("id"));
+                    assertEquals("Category 1", category.get("name"));
+
+                }
+
+                assertTrue(expectedProductIds.isEmpty());
+            }
+            
+            
+            
+            
+            
+        }
+        
+        
+        
+
+        
+    }
+
+    private VendingMachine createVendingMachine(String id, String name) {
         PaymentProcessor processor = new PaymentProcessor();
         processor.setDeleted(false);
         processor.setId("P1");
@@ -307,8 +426,8 @@ public class TypeMappingServiceImplTest {
         product2.setDeleted(false);
 
         VendingMachine machine = new VendingMachine();
-        machine.setId("V1");
-        machine.setName("Vending Machine 1");
+        machine.setId(id);
+        machine.setName(name);
         machine.setDeleted(true);
         machine.setProcessor(processor);
 

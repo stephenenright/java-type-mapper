@@ -62,6 +62,10 @@ public class Errors {
         return addError(new ErrorDetail(message, t));
     }
 
+    public Errors errorGeneral(String message) {
+        return addError(new ErrorDetail(message, null));
+    }
+
     public TypeMappingException toPropertyGetterMappingException() {
         return new PropertyGetterException(error.getMessage(), error.getCause());
     }

@@ -38,14 +38,24 @@ public class TypeMappingServiceImpl implements TypeMappingService {
     }
 
     @Override
-    public <S, D extends Map<String, Object>> Map<String, Object> mapToMap(S src) {
+    public <S, D extends Map<String, Object>> D mapToMap(S src) {
         return mapToMap(src, null);
     }
 
     @Override
-    public <S, D extends Map<String, Object>> Map<String, Object> mapToMap(S src,
+    public <S, D extends Map<String, Object>> D mapToMap(S src,
             TypeMapperConfiguration configuration) {
         return mapInternal(src, null, Map.class, configuration, TypeMappingToStrategy.MAP);
+    }
+    
+    @Override
+    public <S, D extends Map<String, Object>> List<D> mapToListOfMap(List<S> src) {
+        return mapToListOfMap(src, null);
+    }
+
+    @Override
+    public <S, D extends Map<String, Object>> List<D> mapToListOfMap(List<S> src, TypeMapperConfiguration configuration) {
+        return mapInternal(src, null, List.class, configuration, TypeMappingToStrategy.LIST_OF_MAP);
     }
 
     @Override

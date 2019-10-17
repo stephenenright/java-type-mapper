@@ -19,7 +19,7 @@ public class TypeMapper {
         return typeMappingService.map(source, destinationType, configuration);
     }
 
-    public <S, D extends Map<String, Object>> Map<String, Object> mapToMap(S source) {
+    public <S, D extends Map<String, Object>> D mapToMap(S source) {
         return typeMappingService.mapToMap(source, configuration);
     }
 

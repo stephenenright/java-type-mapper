@@ -6,6 +6,7 @@ import java.util.List;
 import com.stephenenright.typemapper.TypeMappingConfiguration;
 import com.stephenenright.typemapper.TypeMappingService;
 import com.stephenenright.typemapper.internal.TypeMappingConversionStrategy;
+import com.stephenenright.typemapper.internal.TypeMappingConversionStrategyListOfMapImpl;
 import com.stephenenright.typemapper.internal.TypeMappingConversionStrategyMapImpl;
 import com.stephenenright.typemapper.internal.TypeMappingConversionStrategyObjectImpl;
 import com.stephenenright.typemapper.internal.TypeMappingConversionStrategyRegistry;
@@ -62,9 +63,12 @@ public abstract class TypeMappingServiceConfiguer {
         TypeMappingConversionStrategy objectStrategy = new TypeMappingConversionStrategyObjectImpl(mappingInfoRegistry,
                 typeInfoRegistry, typePropertyInfoRegistry);
         TypeMappingConversionStrategy mapStrategy = new TypeMappingConversionStrategyMapImpl(typeInfoRegistry);
-      
+        TypeMappingConversionStrategy listOfMapStrategy = new TypeMappingConversionStrategyListOfMapImpl(
+                typeInfoRegistry);
+        
         conversionStrategyRegistry.register(TypeMappingToStrategy.OBJECT, objectStrategy);
         conversionStrategyRegistry.register(TypeMappingToStrategy.MAP,  mapStrategy);
+        conversionStrategyRegistry.register(TypeMappingToStrategy.LIST_OF_MAP,  listOfMapStrategy);
         
         TypeMappingService service = new TypeMappingServiceImpl(converterRegistryList, conversionStrategyRegistry);
 
