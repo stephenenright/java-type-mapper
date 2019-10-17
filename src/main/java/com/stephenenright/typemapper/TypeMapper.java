@@ -1,5 +1,6 @@
 package com.stephenenright.typemapper;
 
+import java.util.List;
 import java.util.Map;
 
 import com.stephenenright.typemapper.converter.TypeConverter;
@@ -21,6 +22,10 @@ public class TypeMapper {
 
     public <S, D extends Map<String, Object>> D mapToMap(S source) {
         return typeMappingService.mapToMap(source, configuration);
+    }
+
+    public <S, D extends Map<String, Object>> List<D> mapToListOfMap(List<S> source) {
+        return typeMappingService.mapToListOfMap(source, configuration);
     }
 
     public <S, D> void addTypeConverter(TypeConverter<S, D> typeConverter) {
