@@ -2,11 +2,7 @@ package com.stephenenright.typemapper;
 
 import com.stephenenright.typemapper.converter.TypeConverter;
 import com.stephenenright.typemapper.converter.TypeConverterFactory;
-import com.stephenenright.typemapper.internal.configuration.TypeMapperConfigurationImpl;
 
-/**
- * Configuration used to to configure an individual type mapping
- */
 public interface TypeMapperConfiguration {
 
     /**
@@ -38,11 +34,39 @@ public interface TypeMapperConfiguration {
     public <S, D> void addTypeConverterFactory(TypeConverterFactory<S, D> factory);
 
     /**
-     * Create a new configuration instance
-     * 
-     * @return the configuration instance
+     * Returns a type converter for the given source and destination type
      */
-    public static TypeMapperConfiguration create() {
-        return new TypeMapperConfigurationImpl();
-    }
+    public <S, D> TypeConverter<S, D> getTypeConverter(Class<S> sourceType, Class<D> destinationType);
+
+    /**
+     * Determines if there are include mappings configured
+     */
+    public boolean hasIncludeMappings();
+
+    /**
+     * Set the properties that will only be included in the mapping
+     * 
+     * @param properties the property paths
+     */
+    public void addIncludeMapping(String... properties);
+
+    /**
+     * Determines if there are exclude mappings configured
+     */
+    public boolean hasExcludeMappings();
+
+    /**
+     * Set the properties that will only be excluded from the mapping
+     * 
+     * @param properties the property paths
+     */
+    public void addExcludeMapping(String... properties);
+
+
+    /**
+     * Returns if the property should be included in the mapping
+     */
+    public boolean isMappingIncluded(String parentPath, String propertyPath, Object valueToMap,
+            TypeInfoRegistry typeInfoRegistry);
+
 }

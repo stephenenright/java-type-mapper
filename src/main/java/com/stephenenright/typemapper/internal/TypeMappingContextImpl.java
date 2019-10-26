@@ -9,14 +9,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import com.stephenenright.typemapper.TypeInfoRegistry;
 import com.stephenenright.typemapper.TypeMapperConfiguration;
 import com.stephenenright.typemapper.TypeMappingContext;
 import com.stephenenright.typemapper.TypeMappingService;
 import com.stephenenright.typemapper.TypeToken;
 import com.stephenenright.typemapper.converter.TypeConverter;
 import com.stephenenright.typemapper.internal.common.CommonConstants;
-import com.stephenenright.typemapper.internal.configuration.TypeMapperConfigurationImpl;
-import com.stephenenright.typemapper.internal.type.info.TypeInfoRegistry;
 import com.stephenenright.typemapper.internal.type.info.TypePropertyGetter;
 import com.stephenenright.typemapper.internal.type.info.TypePropertySetter;
 import com.stephenenright.typemapper.internal.type.mapping.TypeMapping;
@@ -38,8 +37,9 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
     private final Type genericDestinationType;
     private final TypeMappingService mappingService;
     private TypeMapping mapping;
-    private final TypeMapperConfigurationImpl configuration;
+    private final TypeMapperConfiguration configuration;
     private final List<String> processedPaths;
+    private String sourcePath;
     private final String destinationPath;
     private TypeMappingContextImpl<?, ?> parent;
     private boolean providedDestination;
@@ -58,8 +58,9 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
         
         this.strategy = strategy;
         this.parent = null;
+        this.sourcePath = CommonConstants.EMPTY_STRING;
         this.destinationPath = CommonConstants.EMPTY_STRING;
-        this.configuration = (TypeMapperConfigurationImpl) configuration;
+        this.configuration = configuration;
         this.source = source;
         this.sourceType = sourceType;
         this.destination = destination;
@@ -97,7 +98,7 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
 
         this.parent = contextImpl;
         this.strategy = parent.getTypeMappingToStrategy();
-        this.configuration = (TypeMapperConfigurationImpl) context.getConfiguration();
+        this.configuration = context.getConfiguration();
         this.source = source;
         this.sourceType = sourceType;
         this.destination = destination;
@@ -106,8 +107,10 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
         this.genericDestinationType = genericDestinationType;
         this.mappingService = context.getMappingService();
         this.mapping = mapping;
+        this.sourcePath = mapping == null ? contextImpl.sourcePath
+                : PropertyPathUtils.joinPaths(contextImpl.sourcePath,mapping.getSourcePath());
         this.destinationPath = mapping == null ? contextImpl.destinationPath
-                : contextImpl.destinationPath + mapping.getDestinationPath();
+                : PropertyPathUtils.joinPaths(contextImpl.destinationPath,mapping.getDestinationPath());
 
         this.processedPaths = inherit ? contextImpl.processedPaths : new LinkedList<String>();
         this.destinationCache = inherit ? contextImpl.destinationCache : new HashMap<String, Object>();
@@ -148,7 +151,11 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
     public TypeMappingService getMappingService() {
         return mappingService;
     }
-
+    
+    public String getSourcePath() {
+        return this.sourcePath;
+    }
+    
     public String getDestinationPath() {
         return this.destinationPath;
     }

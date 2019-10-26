@@ -27,7 +27,7 @@ class TypePropertyMethodSetterImpl extends TypePropertyInfoBase<Method> implemen
 
     @Override
     public String toString() {
-        return member == null ? name : member.getDeclaringClass().getSimpleName() + "." + name;
+        return name;
     }
 
 }

@@ -3,6 +3,7 @@ package com.stephenenright.typemapper.internal.configuration;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.stephenenright.typemapper.TypeInfoRegistry;
 import com.stephenenright.typemapper.TypeMappingConfiguration;
 import com.stephenenright.typemapper.TypeMappingService;
 import com.stephenenright.typemapper.internal.TypeMappingConversionStrategy;
@@ -17,7 +18,6 @@ import com.stephenenright.typemapper.internal.conversion.TypeConverterRegistry;
 import com.stephenenright.typemapper.internal.conversion.TypeConverterRegistryImpl;
 import com.stephenenright.typemapper.internal.type.info.TypeInfoCreator;
 import com.stephenenright.typemapper.internal.type.info.TypeInfoCreatorDefaultImpl;
-import com.stephenenright.typemapper.internal.type.info.TypeInfoRegistry;
 import com.stephenenright.typemapper.internal.type.info.TypeInfoRegistryImpl;
 import com.stephenenright.typemapper.internal.type.info.TypePropertyInfoCollector;
 import com.stephenenright.typemapper.internal.type.info.TypePropertyInfoCollectorImpl;

@@ -6,9 +6,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
+import com.stephenenright.typemapper.TypeInfo;
+import com.stephenenright.typemapper.TypeInfoRegistry;
 import com.stephenenright.typemapper.TypeMapperConfiguration;
-import com.stephenenright.typemapper.internal.type.info.TypeInfo;
-import com.stephenenright.typemapper.internal.type.info.TypeInfoRegistry;
 
 public abstract class JavaBeanUtils {
 

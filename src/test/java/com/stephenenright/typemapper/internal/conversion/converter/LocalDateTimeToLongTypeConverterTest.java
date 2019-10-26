@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 import org.junit.Test;
 
+import com.stephenenright.typemapper.DefaultMapperConfiguration;
 import com.stephenenright.typemapper.TypeMappingContext;
 import com.stephenenright.typemapper.test.fixture.utils.FixtureUtils;
 
@@ -14,12 +15,12 @@ public class LocalDateTimeToLongTypeConverterTest {
     @Test
     public void convert() {
         LocalDateTime time = LocalDateTime.now();
- 
-        TypeMappingContext<LocalDateTime, Long> context = FixtureUtils.createMappingContext(time,Long.class);
-        
+
+        TypeMappingContext<LocalDateTime, Long> context = FixtureUtils.createMappingContext(time, Long.class,
+                DefaultMapperConfiguration.create());
+
         Long result = LocalDateTimeToLongTypeConverter.INSTANCE.convert(context);
         assertNotNull(result);
     }
-    
-    
+
 }

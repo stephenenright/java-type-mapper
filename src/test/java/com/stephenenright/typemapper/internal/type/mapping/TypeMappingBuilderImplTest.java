@@ -10,6 +10,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.stephenenright.typemapper.DefaultMapperConfiguration;
 import com.stephenenright.typemapper.TypeMapperConfiguration;
 import com.stephenenright.typemapper.TypeMappingService;
 import com.stephenenright.typemapper.internal.TypeMappingContextImpl;
@@ -43,7 +44,7 @@ public class TypeMappingBuilderImplTest {
         expectedMappings.put("PaymentProcessor.gateway.name", "PaymentProcessorDto.gateway.name");
         expectedMappings.put("PaymentProcessor.gateway.id", "PaymentProcessorDto.gateway.id");
 
-        TypeMapperConfiguration configuration = TypeMapperConfiguration.create();
+        TypeMapperConfiguration configuration = DefaultMapperConfiguration.create();
         PaymentProcessor sourceObject = new PaymentProcessor();
         TypeMappingContextImpl<PaymentProcessor, PaymentProcessorDto> contextImpl = 
                 new TypeMappingContextImpl<>(configuration, sourceObject, PaymentProcessorDto.class, mappingService, TypeMappingToStrategy.OBJECT);
@@ -91,7 +92,7 @@ public class TypeMappingBuilderImplTest {
                 new TypeMappingContextImpl<>(configuration, vendingMachine, VendingMachineDto.class, mappingService, TypeMappingToStrategy.OBJECT);
        
         TypeMappingInfo<VendingMachine, VendingMachineDto> mappingInfo2 = FixtureUtils
-                .createDefaultTypeMappingInfo(VendingMachine.class, VendingMachineDto.class);
+                .createDefaultTypeMappingInfo(VendingMachine.class, VendingMachineDto.class, DefaultMapperConfiguration.create());
        
         builder.buildMappings(vendingMachine, mappingInfo2, contextImpl2, mappingInfoRegistry);
 

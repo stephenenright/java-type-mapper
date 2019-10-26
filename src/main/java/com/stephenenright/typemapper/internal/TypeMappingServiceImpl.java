@@ -6,6 +6,8 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import com.stephenenright.typemapper.DefaultMapperConfiguration;
+import com.stephenenright.typemapper.MapMapperConfiguration;
 import com.stephenenright.typemapper.TypeMapperConfiguration;
 import com.stephenenright.typemapper.TypeMappingContext;
 import com.stephenenright.typemapper.TypeMappingService;
@@ -33,7 +35,7 @@ public class TypeMappingServiceImpl implements TypeMappingService {
     }
 
     @Override
-    public <S, D> D map(S src, Class<D> destination, TypeMapperConfiguration configuration) {
+    public <S, D> D map(S src, Class<D> destination, DefaultMapperConfiguration configuration) {
         return mapInternal(src, null, destination, configuration, TypeMappingToStrategy.OBJECT);
     }
 
@@ -43,18 +45,18 @@ public class TypeMappingServiceImpl implements TypeMappingService {
     }
 
     @Override
-    public <S, D extends Map<String, Object>> D mapToMap(S src,
-            TypeMapperConfiguration configuration) {
+    public <S, D extends Map<String, Object>> D mapToMap(S src, MapMapperConfiguration configuration) {
         return mapInternal(src, null, Map.class, configuration, TypeMappingToStrategy.MAP);
     }
-    
+
     @Override
     public <S, D extends Map<String, Object>> List<D> mapToListOfMap(List<S> src) {
         return mapToListOfMap(src, null);
     }
 
     @Override
-    public <S, D extends Map<String, Object>> List<D> mapToListOfMap(List<S> src, TypeMapperConfiguration configuration) {
+    public <S, D extends Map<String, Object>> List<D> mapToListOfMap(List<S> src,
+            MapMapperConfiguration configuration) {
         return mapInternal(src, null, List.class, configuration, TypeMappingToStrategy.LIST_OF_MAP);
     }
 
@@ -83,7 +85,7 @@ public class TypeMappingServiceImpl implements TypeMappingService {
             TypeMapperConfiguration configuration, TypeMappingToStrategy mappingToStrategy) {
 
         TypeMappingContextImpl<S, D> context = new TypeMappingContextImpl<S, D>(
-                configuration == null ? TypeMapperConfiguration.create() : configuration, source, sourceType,
+                configuration == null ? createConfiguration(mappingToStrategy) : configuration, source, sourceType,
                 destination, destinationTypeToken.getRawType(), destinationTypeToken.getType(), this,
                 mappingToStrategy);
 
@@ -128,5 +130,16 @@ public class TypeMappingServiceImpl implements TypeMappingService {
 
     public <S, D> TypeConverter<S, D> getTypeConverterFromContext(TypeMappingContextImpl<S, D> context) {
         return context.getTypeConverter(context.getSourceType(), context.getDestinationType());
+    }
+
+    private TypeMapperConfiguration createConfiguration(TypeMappingToStrategy mappingToStrategy) {
+        if (mappingToStrategy == TypeMappingToStrategy.OBJECT) {
+            return DefaultMapperConfiguration.create();
+        } else if (mappingToStrategy == TypeMappingToStrategy.MAP
+                || mappingToStrategy == TypeMappingToStrategy.LIST_OF_MAP) {
+            return MapMapperConfiguration.create();
+        } else {
+            throw new IllegalArgumentException("Unsupported mapping to strategy");
+        }
     }
 }

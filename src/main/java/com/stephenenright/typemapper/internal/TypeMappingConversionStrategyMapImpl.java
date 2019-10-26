@@ -3,7 +3,7 @@ package com.stephenenright.typemapper.internal;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.stephenenright.typemapper.internal.type.info.TypeInfoRegistry;
+import com.stephenenright.typemapper.TypeInfoRegistry;
 
 /**
  * Opinionated TypeMappingConversionStrategy that converts a source object to a

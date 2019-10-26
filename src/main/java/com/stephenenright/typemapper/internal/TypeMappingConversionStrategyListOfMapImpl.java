@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.stephenenright.typemapper.TypeInfoRegistry;
 import com.stephenenright.typemapper.internal.common.error.Errors;
-import com.stephenenright.typemapper.internal.type.info.TypeInfoRegistry;
 import com.stephenenright.typemapper.internal.util.ListUtils;
 
 /**
@@ -74,7 +74,15 @@ public class TypeMappingConversionStrategyListOfMapImpl extends TypeMappingConve
         public void resetAfterObjectBuilt() {
             pathToDestinationObjectCache.clear();
             path.clear();
-            currentPath = null;
+            
+            if(indexPropertiesSet!=null) {
+                indexPropertiesSet = null;
+            }
+            
+            hasIndexedProperty = false;
+  
+            resetCachedPaths();
+           
             sourceToDestination.clear();
             destinationRoot.add(buildingObject);
             buildingObject = null;

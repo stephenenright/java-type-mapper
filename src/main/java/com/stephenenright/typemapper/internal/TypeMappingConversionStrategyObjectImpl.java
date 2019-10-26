@@ -2,10 +2,10 @@ package com.stephenenright.typemapper.internal;
 
 import java.lang.reflect.Type;
 
+import com.stephenenright.typemapper.TypeInfoRegistry;
 import com.stephenenright.typemapper.converter.TypeConverter;
 import com.stephenenright.typemapper.exception.TypeMappingException;
 import com.stephenenright.typemapper.internal.common.error.Errors;
-import com.stephenenright.typemapper.internal.type.info.TypeInfoRegistry;
 import com.stephenenright.typemapper.internal.type.info.TypePropertyGetter;
 import com.stephenenright.typemapper.internal.type.info.TypePropertyInfoRegistry;
 import com.stephenenright.typemapper.internal.type.info.TypePropertySetter;
@@ -16,6 +16,7 @@ import com.stephenenright.typemapper.internal.util.ArrayUtils;
 import com.stephenenright.typemapper.internal.util.ClassUtils;
 import com.stephenenright.typemapper.internal.util.CollectionUtils;
 import com.stephenenright.typemapper.internal.util.ListUtils;
+import com.stephenenright.typemapper.internal.util.PropertyPathUtils;
 import com.stephenenright.typemapper.internal.util.ProxyUtils;
 
 /**
@@ -38,6 +39,13 @@ public class TypeMappingConversionStrategyObjectImpl extends TypeMappingConversi
     @SuppressWarnings("unchecked")
     @Override
     public <S, D> D map(TypeMappingContextImpl<S, D> context) {
+        final String sourcePath = context.getSourcePath();
+
+        if (!processPathForProperty(PropertyPathUtils.getParentPath(sourcePath), sourcePath, context.getSource(),
+                context)) {
+            return null;
+        }
+
         try {
             Class<D> destinationType = context.getDestinationType();
             D destinationObj = null;
@@ -46,6 +54,7 @@ public class TypeMappingConversionStrategyObjectImpl extends TypeMappingConversi
                 D potentialCircularDest = context.destinationForSource();
                 if (potentialCircularDest != null
                         && potentialCircularDest.getClass().isAssignableFrom(context.getDestinationType())) {
+
                     return potentialCircularDest;
                 }
             }
@@ -98,13 +107,25 @@ public class TypeMappingConversionStrategyObjectImpl extends TypeMappingConversi
     }
 
     private <S, D> void mapWithMapping(TypeMapping mapping, TypeMappingContextImpl<S, D> context) {
+
         String destinationPath = mapping.getDestinationPath();
 
         if (context.isPathProcessed(destinationPath)) {
             return;
         }
 
+        String propertyPath = PropertyPathUtils.joinPaths(context.getDestinationPath(), destinationPath);
+
+        final String sourcePath = context.getSourcePath();
+        final String sourcePropertyPath = PropertyPathUtils.joinPaths(context.getSourcePath(), mapping.getSourcePath());
+
         Object sourceObject = resolveSourceValue(mapping, context);
+
+        if (!processPathForProperty(sourcePath, sourcePropertyPath, sourceObject, context)) {
+            context.setPathProcessed(propertyPath);
+            return;
+        }
+
         TypeMappingContextImpl<Object, Object> propertyContext = createContextForProperty(sourceObject, mapping,
                 context);
         setDestinationValue(mapping, propertyContext, context);
@@ -194,4 +215,15 @@ public class TypeMappingConversionStrategyObjectImpl extends TypeMappingConversi
         return new TypeMappingContextImpl(context, source, sourceType, null, destinationType, genericDestinationType,
                 mapping, true);
     }
+
+    private boolean processPathForProperty(String sourceParentPath, String sourcePath, Object sourceValue,
+            TypeMappingContextImpl<?, ?> context) {
+        if (sourceValue == null) {
+            return false;
+        }
+
+        return context.getConfiguration().isMappingIncluded(sourceParentPath, sourcePath, sourceValue,
+                typeInfoRegistry);
+    }
+
 }

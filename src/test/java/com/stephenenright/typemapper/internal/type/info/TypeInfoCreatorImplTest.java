@@ -11,6 +11,8 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.stephenenright.typemapper.DefaultMapperConfiguration;
+import com.stephenenright.typemapper.TypeInfo;
 import com.stephenenright.typemapper.TypeIntrospector;
 import com.stephenenright.typemapper.TypeMapperConfiguration;
 import com.stephenenright.typemapper.test.models.vending.PaymentProcessor;
@@ -42,7 +44,7 @@ public class TypeInfoCreatorImplTest {
         expectedSetterMap.put("processor", PaymentProcessor.class);
         expectedSetterMap.put("status", VendingMachineStatus.class);
 
-        TypeMapperConfiguration configuration = TypeMapperConfiguration.create();
+        TypeMapperConfiguration configuration = DefaultMapperConfiguration.create();
         TypeInfo<VendingMachine> typeInfo = creator.create(VendingMachine.class, configuration);
 
         assertNotNull(typeInfo);

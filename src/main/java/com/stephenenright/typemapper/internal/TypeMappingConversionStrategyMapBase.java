@@ -4,16 +4,19 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
+import com.stephenenright.typemapper.TypeInfo;
+import com.stephenenright.typemapper.TypeInfoRegistry;
 import com.stephenenright.typemapper.internal.collection.Stack;
 import com.stephenenright.typemapper.internal.common.CommonConstants;
+import com.stephenenright.typemapper.internal.common.Pair;
 import com.stephenenright.typemapper.internal.common.error.Errors;
-import com.stephenenright.typemapper.internal.type.info.TypeInfo;
-import com.stephenenright.typemapper.internal.type.info.TypeInfoRegistry;
 import com.stephenenright.typemapper.internal.type.info.TypePropertyGetter;
 import com.stephenenright.typemapper.internal.util.ArrayUtils;
 import com.stephenenright.typemapper.internal.util.ClassUtils;
@@ -59,6 +62,10 @@ abstract class TypeMappingConversionStrategyMapBase implements TypeMappingConver
 
     protected void mapProperty(String propertyName, Object sourceValue, ConversionContext<?> context) {
         if (sourceValue == null) {
+            return;
+        }
+
+        if (!processPathForProperty(propertyName, sourceValue,context)) {
             return;
         }
 
@@ -114,6 +121,10 @@ abstract class TypeMappingConversionStrategyMapBase implements TypeMappingConver
             return;
         }
 
+        if (!processPath(context,sourceValue)) {
+            return;
+        }
+
         Class<?> sourceType = sourceValue.getClass();
 
         if (MapUtils.isMap(sourceType)) {
@@ -146,7 +157,8 @@ abstract class TypeMappingConversionStrategyMapBase implements TypeMappingConver
 
     }
 
-    protected void mapBean(TypeInfo<?> typeInfo, Class<?> sourceType, Object sourceValue, ConversionContext<?> context) {
+    protected void mapBean(TypeInfo<?> typeInfo, Class<?> sourceType, Object sourceValue,
+            ConversionContext<?> context) {
         Map<String, TypePropertyGetter> getters = typeInfo.getPropertyGetters();
 
         for (Entry<String, TypePropertyGetter> getterEntry : getters.entrySet()) {
@@ -158,7 +170,7 @@ abstract class TypeMappingConversionStrategyMapBase implements TypeMappingConver
         final int sourceArrayLength = ArrayUtils.getLength(sourceValue);
 
         for (int i = 0; i < sourceArrayLength; i++) {
-            context.pathPush(PropertyPathUtils.createIndexedPropertyName(i));
+            context.pushIndexedProperty(i);
             Object arrSourceElement = Array.get(sourceValue, i);
             mapObject(arrSourceElement, context);
             context.pathPop();
@@ -170,7 +182,7 @@ abstract class TypeMappingConversionStrategyMapBase implements TypeMappingConver
 
         int i = 0;
         for (Object value : collection) {
-            context.pathPush(PropertyPathUtils.createIndexedPropertyName(i));
+            context.pushIndexedProperty(i);
             mapObject(value, context);
             context.pathPop();
             i++;
@@ -189,13 +201,28 @@ abstract class TypeMappingConversionStrategyMapBase implements TypeMappingConver
         }
     }
 
+    private boolean processPathForProperty(String propertyName, Object value, ConversionContext<?> context) {
+        final String propertyPath = PropertyPathUtils.joinPaths(context.getCurrentPropertyPath(), propertyName);
+        return context.getMappingContext().getConfiguration().isMappingIncluded(context.getCurrentPropertyPath(), propertyPath, value, typeInfoRegistry);
+    }
+
+    private boolean processPath(ConversionContext<?> context,  Object value) {
+        return context.getMappingContext().getConfiguration().isMappingIncluded(context.getCurrentPropertyPathParent(), context.getCurrentPropertyPath(), value, typeInfoRegistry);
+    }
+
     protected abstract static class ConversionContext<T> {
         protected T destinationRoot;
 
         protected Map<String, Object> pathToDestinationObjectCache = new HashMap<>();
         protected final TypeMappingContextImpl<?, ?> mappingContext;
         protected Stack<String> path = new Stack<String>();
+        protected Set<Integer> indexPropertiesSet;
+        protected boolean hasIndexedProperty = false;
         protected String currentPath;
+        protected String currentPathParent;
+        protected String currentPropertyPath;
+        protected String currentPropertyParentPath;
+
         protected final Map<Object, Object> sourceToDestination;
 
         public ConversionContext(TypeMappingContextImpl<?, ?> mappingContext) {
@@ -203,14 +230,30 @@ abstract class TypeMappingConversionStrategyMapBase implements TypeMappingConver
             sourceToDestination = new IdentityHashMap<>();
         }
 
+        public void pushIndexedProperty(int index) {
+            if (indexPropertiesSet == null) {
+                indexPropertiesSet = new HashSet<>();
+            }
+
+            indexPropertiesSet.add(path.size());
+            hasIndexedProperty = true;
+            path.push(PropertyPathUtils.createIndexedPropertyName(index));
+            currentPath = null;
+        }
+
         public void pathPush(String property) {
             path.push(property);
+            resetCachedPaths();
         }
 
         public String pathPop() {
             if (path.size() > 0) {
-                currentPath = null;
-                return path.pop();
+                resetCachedPaths();
+                String popped = path.pop();
+                if (PropertyPathUtils.isPathIndexedPath(popped)) {
+                    indexPropertiesSet.remove(path.size());
+                }
+                return popped;
             }
 
             return CommonConstants.EMPTY_STRING;
@@ -219,11 +262,47 @@ abstract class TypeMappingConversionStrategyMapBase implements TypeMappingConver
         public String getCurrentPath() {
             if (currentPath != null) {
                 return currentPath;
-            } else if (path.size() <= 0) {
-                return CommonConstants.EMPTY_STRING;
+            } else if (path.size() == 0) {
+                currentPath = CommonConstants.EMPTY_STRING;
+                return currentPath;
             } else {
-                return PropertyPathUtils.joinPaths(path);
+                Pair<String, String> pathPair = PropertyPathUtils.joinPathsWithParent(path, null);
+                currentPathParent = pathPair.getValue1();
+                currentPath = pathPair.getValue2();
+                return currentPath;
             }
+        }
+
+        public String getCurrentPathParent() {
+            getCurrentPath();
+            return currentPathParent;
+        }
+
+        public String getCurrentPropertyPath() {
+            if (!hasIndexedProperty) {
+                return getCurrentPath();
+            }
+
+            if (currentPropertyPath != null) {
+                return currentPropertyPath;
+            } else if (indexPropertiesSet.size() == 0) {
+                return getCurrentPath();
+            } else {
+                Pair<String, String> pathPair = PropertyPathUtils.joinPathsWithParent(path, indexPropertiesSet);
+                currentPropertyParentPath = pathPair.getValue1(); 
+                currentPropertyPath = pathPair.getValue2();
+                return currentPropertyPath;
+            }
+        }
+
+        public String getCurrentPropertyPathParent() {
+            if (!hasIndexedProperty) {
+                return getCurrentPathParent();
+            }
+
+            getCurrentPropertyPath();
+            return currentPropertyParentPath;
+
         }
 
         public TypeMappingContextImpl<?, ?> getMappingContext() {
@@ -237,6 +316,7 @@ abstract class TypeMappingConversionStrategyMapBase implements TypeMappingConver
         @SuppressWarnings("unchecked")
         public void setDestinationPropertyValue(Object sourceValue, String propertyName, Object value,
                 Boolean setParent, Boolean trackSource) {
+
             // TODO add includes, excludes, custom conversion etc
 
             final String parentPath = getCurrentPath();
@@ -309,7 +389,13 @@ abstract class TypeMappingConversionStrategyMapBase implements TypeMappingConver
             return sourceToDestination.get(source);
         }
 
-        protected abstract void setRootObjectPropertyValue(String propertyName, Object value);
+        protected void resetCachedPaths() {
+            currentPath = null;
+            currentPathParent = null;
+            currentPropertyPath = null;
+            currentPropertyParentPath = null;
+        }
 
+        protected abstract void setRootObjectPropertyValue(String propertyName, Object value);
     }
 }

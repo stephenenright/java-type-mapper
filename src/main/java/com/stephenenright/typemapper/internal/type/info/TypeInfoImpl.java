@@ -2,6 +2,7 @@ package com.stephenenright.typemapper.internal.type.info;
 
 import java.util.Map;
 
+import com.stephenenright.typemapper.TypeInfo;
 import com.stephenenright.typemapper.TypeMapperConfiguration;
 
 public class TypeInfoImpl<T> implements TypeInfo<T> {

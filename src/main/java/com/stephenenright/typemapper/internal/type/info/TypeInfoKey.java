@@ -1,5 +1,6 @@
 package com.stephenenright.typemapper.internal.type.info;
 
+import com.stephenenright.typemapper.TypeInfo;
 import com.stephenenright.typemapper.TypeMapperConfiguration;
 
 class TypeInfoKey {

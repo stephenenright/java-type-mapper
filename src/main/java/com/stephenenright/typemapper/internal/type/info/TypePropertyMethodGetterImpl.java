@@ -3,7 +3,6 @@ package com.stephenenright.typemapper.internal.type.info;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
-import com.stephenenright.typemapper.exception.PropertyGetterException;
 import com.stephenenright.typemapper.internal.common.error.Errors;
 
 class TypePropertyMethodGetterImpl extends TypePropertyInfoBase<Method> implements TypePropertyGetter {
@@ -29,7 +28,7 @@ class TypePropertyMethodGetterImpl extends TypePropertyInfoBase<Method> implemen
 
     @Override
     public String toString() {
-        return member == null ? name : member.getDeclaringClass().getSimpleName() + "." + name;
+        return name;
     }
 
 }

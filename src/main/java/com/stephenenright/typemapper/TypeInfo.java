@@ -1,8 +1,9 @@
-package com.stephenenright.typemapper.internal.type.info;
+package com.stephenenright.typemapper;
 
 import java.util.Map;
 
-import com.stephenenright.typemapper.TypeMapperConfiguration;
+import com.stephenenright.typemapper.internal.type.info.TypePropertyGetter;
+import com.stephenenright.typemapper.internal.type.info.TypePropertySetter;
 
 /**
  * Describes a type for the given configuration

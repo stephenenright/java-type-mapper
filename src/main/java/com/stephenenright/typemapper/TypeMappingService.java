@@ -9,15 +9,15 @@ public interface TypeMappingService {
     
     public <S, D> D map(S source, Class<D> destination);
 
-    public <S, D> D map(S source, Class<D> destination, TypeMapperConfiguration configuration);
+    public <S, D> D map(S source, Class<D> destination, DefaultMapperConfiguration configuration);
     
     public <S, D extends Map<String,Object>> D mapToMap(S source);
 
-    public <S, D extends Map<String,Object>> D mapToMap(S source, TypeMapperConfiguration configuration);
+    public <S, D extends Map<String,Object>> D mapToMap(S source, MapMapperConfiguration configuration);
     
     public <S, D extends Map<String,Object>> List<D> mapToListOfMap(List<S> source);
 
-    public <S, D extends Map<String,Object>> List<D> mapToListOfMap(List<S> source, TypeMapperConfiguration configuration);
+    public <S, D extends Map<String,Object>> List<D> mapToListOfMap(List<S> source, MapMapperConfiguration configuration);
  
     public <S, D> D map(TypeMappingContext<S, D> context);
 

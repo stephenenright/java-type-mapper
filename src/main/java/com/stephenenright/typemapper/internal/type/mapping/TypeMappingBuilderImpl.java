@@ -4,14 +4,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 
+import com.stephenenright.typemapper.TypeInfo;
+import com.stephenenright.typemapper.TypeInfoRegistry;
 import com.stephenenright.typemapper.TypeMapperConfiguration;
 import com.stephenenright.typemapper.converter.TypeConditionalConverter;
 import com.stephenenright.typemapper.converter.TypeConditionalConverter.MatchResult;
 import com.stephenenright.typemapper.converter.TypeConverter;
 import com.stephenenright.typemapper.internal.TypeMappingContextImpl;
 import com.stephenenright.typemapper.internal.collection.Stack;
-import com.stephenenright.typemapper.internal.type.info.TypeInfo;
-import com.stephenenright.typemapper.internal.type.info.TypeInfoRegistry;
 import com.stephenenright.typemapper.internal.type.info.TypePropertyGetter;
 import com.stephenenright.typemapper.internal.type.info.TypePropertySetter;
 import com.stephenenright.typemapper.internal.util.JavaBeanUtils;

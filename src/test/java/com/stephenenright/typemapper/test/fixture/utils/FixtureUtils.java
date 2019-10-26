@@ -2,6 +2,7 @@ package com.stephenenright.typemapper.test.fixture.utils;
 
 import java.util.Arrays;
 
+import com.stephenenright.typemapper.TypeInfoRegistry;
 import com.stephenenright.typemapper.TypeMapperConfiguration;
 import com.stephenenright.typemapper.internal.TypeMappingContextImpl;
 import com.stephenenright.typemapper.internal.TypeMappingConversionStrategy;
@@ -15,7 +16,6 @@ import com.stephenenright.typemapper.internal.conversion.TypeConverterCollection
 import com.stephenenright.typemapper.internal.conversion.TypeConverterRegistry;
 import com.stephenenright.typemapper.internal.conversion.TypeConverterRegistryImpl;
 import com.stephenenright.typemapper.internal.type.info.TypeInfoCreatorDefaultImpl;
-import com.stephenenright.typemapper.internal.type.info.TypeInfoRegistry;
 import com.stephenenright.typemapper.internal.type.info.TypeInfoRegistryImpl;
 import com.stephenenright.typemapper.internal.type.info.TypeIntrospectorImpl;
 import com.stephenenright.typemapper.internal.type.info.TypePropertyInfoCollectorImpl;
@@ -27,14 +27,14 @@ import com.stephenenright.typemapper.internal.type.mapping.TypeMappingInfoRegist
 
 public abstract class FixtureUtils {
 
-    public static <S, D> TypeMappingContextImpl<S, D> createMappingContext(S source, Class<D> destinationType) {
-        return new TypeMappingContextImpl<S, D>(TypeMapperConfiguration.create(), source, destinationType,
+    public static <S, D> TypeMappingContextImpl<S, D> createMappingContext(S source, Class<D> destinationType, TypeMapperConfiguration configuration) {
+        return new TypeMappingContextImpl<S, D>(configuration, source, destinationType,
                 FixtureUtils.createDefaultMappingService(), TypeMappingToStrategy.OBJECT);
     }
 
     public static <S, D> TypeMappingContextImpl<S, D> createMappingContext(S source, Class<D> destinationType,
-            TypeMappingToStrategy toStrategy) {
-        return new TypeMappingContextImpl<S, D>(TypeMapperConfiguration.create(), source, destinationType,
+            TypeMappingToStrategy toStrategy, TypeMapperConfiguration configuration) {
+        return new TypeMappingContextImpl<S, D>(configuration, source, destinationType,
                 FixtureUtils.createDefaultMappingService(), toStrategy);
     }
 
@@ -64,15 +64,6 @@ public abstract class FixtureUtils {
 
     public static TypeMappingInfoRegistryImpl createTypeMappingInfoRegistry(TypeInfoRegistry typeInfoRegistry) {
         return new TypeMappingInfoRegistryImpl(new TypeMappingBuilderImpl(typeInfoRegistry));
-    }
-
-    public static <S, D> TypeMappingInfo<S, D> createDefaultTypeMappingInfo(Class<S> sourceType,
-            Class<D> destinationType) {
-        TypeMapperConfiguration configuration = TypeMapperConfiguration.create();
-        TypeMappingInfoImpl<S, D> mappingInfo = new TypeMappingInfoImpl<S, D>(sourceType, destinationType,
-                configuration);
-
-        return mappingInfo;
     }
 
     public static <S, D> TypeMappingInfo<S, D> createDefaultTypeMappingInfo(Class<S> sourceType,

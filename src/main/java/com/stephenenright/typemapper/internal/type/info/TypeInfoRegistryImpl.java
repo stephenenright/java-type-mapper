@@ -2,6 +2,8 @@ package com.stephenenright.typemapper.internal.type.info;
 
 import java.util.Map;
 
+import com.stephenenright.typemapper.TypeInfo;
+import com.stephenenright.typemapper.TypeInfoRegistry;
 import com.stephenenright.typemapper.TypeMapperConfiguration;
 import com.stephenenright.typemapper.internal.collection.ConcurrentReferenceHashMap;
 

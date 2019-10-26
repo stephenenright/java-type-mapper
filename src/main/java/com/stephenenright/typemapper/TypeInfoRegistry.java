@@ -1,6 +1,4 @@
-package com.stephenenright.typemapper.internal.type.info;
-
-import com.stephenenright.typemapper.TypeMapperConfiguration;
+package com.stephenenright.typemapper;
 
 public interface TypeInfoRegistry {
 
