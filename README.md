@@ -64,16 +64,13 @@ In the above code the processor property will be excluded from the mapping.  The
 
 
 ### Post Transformation
-You can add a `TypeTransformer` to transform the destination type after the mapping is complete.  You must be careful to return from the type transformer the same type as the destination type.
-
+You can add a `TypeTransformer` to transform the destination type after the mapping is complete.
 
 ```
 	Double result = new TypeMapper().setPostTransformer(( Integer source, Double dest) -> {
             return 2.0;
     }).map(100, Double.class);
 ```
-
-
 
 ## Mapping To Map
 The `MapMapper` is provided that offers opinionated type mapping. This type mapper will map a source object to a map, where each collection is converted to a list and any map or java bean is converted to a map.
