@@ -34,6 +34,18 @@ public interface TypeMapperConfiguration {
     public <S, D> void addTypeConverterFactory(TypeConverterFactory<S, D> factory);
 
     /**
+     * Adds a post transformer that allows the transformation of the mapped
+     * destination after the mapping is complete
+     * 
+     */
+    public <S, D> void setPostTransformer(TypeTransformer<S,D> transformer);
+
+    /**
+     * Returns the configured post transformer
+     */
+    public <S, D> TypeTransformer<S,D> getPostTransformer();
+
+    /**
      * Returns a type converter for the given source and destination type
      */
     public <S, D> TypeConverter<S, D> getTypeConverter(Class<S> sourceType, Class<D> destinationType);
@@ -61,7 +73,6 @@ public interface TypeMapperConfiguration {
      * @param properties the property paths
      */
     public void addExcludeMapping(String... properties);
-
 
     /**
      * Returns if the property should be included in the mapping

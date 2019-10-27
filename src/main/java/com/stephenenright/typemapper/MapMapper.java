@@ -21,4 +21,24 @@ public class MapMapper {
         return typeMappingService.mapToListOfMap(source, configuration);
     }
 
+    public MapMapper setAccessLevel(TypeAccessLevel accessLevel) {
+        configuration.setAccessLevel(accessLevel);
+        return this;
+    }
+
+    public MapMapper addIncludeMapping(String... properties) {
+        configuration.addIncludeMapping(properties);
+        return this;
+    }
+
+    public MapMapper addExcludeMapping(String... properties) {
+        configuration.addExcludeMapping(properties);
+        return this;
+    }
+
+    public <S, D extends Map<String, Object>> MapMapper setPostTransformer(TypeTransformer<S, D> postTransformer) {
+        configuration.setPostTransformer(postTransformer);
+        return this;
+    }
+
 }

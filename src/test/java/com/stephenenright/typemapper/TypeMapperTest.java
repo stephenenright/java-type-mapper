@@ -31,6 +31,16 @@ import com.stephenenright.typemapper.test.models.vending.VendingMachine;
 
 public class TypeMapperTest {
 
+    @Test
+    public void map_IntegerToDouble() {
+        Double result = new TypeMapper().setPostTransformer(( Integer source, Double dest) -> {
+            return 2.0;
+        }).map(100, Double.class);
+        
+        assertNotNull(result);
+        assertEquals(result, Double.valueOf(2.0));
+    }
+    
     
     @Test
     public void map() {

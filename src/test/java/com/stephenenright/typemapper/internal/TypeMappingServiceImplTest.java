@@ -18,9 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.stephenenright.typemapper.DefaultMapperConfiguration;
-import com.stephenenright.typemapper.MapMapper;
 import com.stephenenright.typemapper.MapMapperConfiguration;
-import com.stephenenright.typemapper.TypeAccessLevel;
 import com.stephenenright.typemapper.internal.common.CommonConstants;
 import com.stephenenright.typemapper.test.dto.vending.PaymentGatewayDto;
 import com.stephenenright.typemapper.test.dto.vending.PaymentProcessorDto;
@@ -52,6 +50,18 @@ public class TypeMappingServiceImplTest {
         Double result = mappingService.map(Integer.valueOf(100), Double.class);
         assertNotNull(result);
         assertEquals(result, Double.valueOf(100));
+    }
+    
+    @Test
+    public void map_IntegerToDoubleWithPostTransformation() {
+        DefaultMapperConfiguration config = DefaultMapperConfiguration.create();
+        config.setPostTransformer(( Integer source, Double dest) -> {
+            return 2.0;
+        });
+        
+        Double result = mappingService.map(100, Double.class, config);
+        assertNotNull(result);
+        assertEquals(result, Double.valueOf(2));
     }
 
     @Test
@@ -359,7 +369,7 @@ public class TypeMappingServiceImplTest {
     
     @SuppressWarnings("unchecked")
     @Test
-    public void mapToMap_BeanWithIncludesExcludes() {
+    public void mapToMap_BeanWithIncludesExcludesAndTransformations() {
         VendingMachine machine = createVendingMachine("V1", "Vending Machine 1");
 
         List<Object> buttons = new LinkedList<Object>();
@@ -375,13 +385,21 @@ public class TypeMappingServiceImplTest {
         MapMapperConfiguration mapperConfig = MapMapperConfiguration.create();
         mapperConfig.addIncludeMapping("*", "configuration.**", "processor.*", "slots.**" );
         mapperConfig.addExcludeMapping("processor");
+        mapperConfig.setPostTransformer((VendingMachine source, Map<String,Object> dest) -> {
+            dest.put("addedValue", "addedValue");
+            return dest;
+        });
         
+    
         Map<String, Object> result = mappingService.mapToMap(machine,mapperConfig);
         assertFalse(result.isEmpty());
 
         assertEquals("V1", result.get("id"));
         assertEquals("Vending Machine 1", result.get("name"));
         assertEquals(true, result.get("deleted"));
+        assertEquals("addedValue", result.get("addedValue"));
+        
+        
 
         Map<String, Object> configuration = (Map<String, Object>) result.get("configuration");
         assertTrue((Boolean) configuration.get("shutdownWhenEmpty"));

@@ -12,6 +12,7 @@ import com.stephenenright.typemapper.TypeMapperConfiguration;
 import com.stephenenright.typemapper.TypeMappingContext;
 import com.stephenenright.typemapper.TypeMappingService;
 import com.stephenenright.typemapper.TypeToken;
+import com.stephenenright.typemapper.TypeTransformer;
 import com.stephenenright.typemapper.converter.TypeConverter;
 import com.stephenenright.typemapper.internal.common.error.Errors;
 import com.stephenenright.typemapper.internal.conversion.TypeConverterRegistry;
@@ -66,7 +67,18 @@ public class TypeMappingServiceImpl implements TypeMappingService {
             TypeMappingContextImpl<S, D> contextImpl = (TypeMappingContextImpl<S, D>) context;
             TypeMappingConversionStrategy conversionStrategy = conversionStrategyRegistry
                     .get(contextImpl.getTypeMappingToStrategy());
-            return conversionStrategy.map(contextImpl);
+            D result =  conversionStrategy.map(contextImpl);
+            
+            if(!contextImpl.hasParentContext()) {
+               TypeTransformer<S,D> postTransformer = contextImpl.getConfiguration().getPostTransformer();
+            
+               if(postTransformer!=null) {
+                   return postTransformer.tranform(contextImpl.getSource(), result);
+               }
+            }
+ 
+            return result;
+            
 
         } catch (Throwable t) {
             throw Errors.createGenericMappingExceptionIfNecessary(t, context);
@@ -75,6 +87,12 @@ public class TypeMappingServiceImpl implements TypeMappingService {
 
     private <D> D mapInternal(Object source, @Nullable D destination, Type destinationType,
             TypeMapperConfiguration configuration, TypeMappingToStrategy mappingToStrategy) {
+        if(source==null) {
+            return null;
+        }
+        
+        
+        
         if (destination != null)
             destinationType = ProxyUtils.<D>unProxy(destination.getClass());
         return mapInternal(source, ProxyUtils.<Object>unProxy(source.getClass()), destination,
@@ -91,7 +109,8 @@ public class TypeMappingServiceImpl implements TypeMappingService {
 
         return map(context);
     }
-
+    
+    
     @Override
     public <S, D> TypeConverter<S, D> getTypeConverter(TypeMappingContext<S, D> context) {
         return getTypeConverter(context.getSourceType(), context.getDestinationType());

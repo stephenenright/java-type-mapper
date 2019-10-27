@@ -6,6 +6,7 @@ import java.util.Set;
 import com.stephenenright.typemapper.TypeAccessLevel;
 import com.stephenenright.typemapper.TypeInfoRegistry;
 import com.stephenenright.typemapper.TypeMapperConfiguration;
+import com.stephenenright.typemapper.TypeTransformer;
 import com.stephenenright.typemapper.converter.TypeConverter;
 import com.stephenenright.typemapper.converter.TypeConverterFactory;
 import com.stephenenright.typemapper.internal.common.CommonConstants;
@@ -28,6 +29,8 @@ class TypeMapperConfigurationBase implements TypeMapperConfiguration {
     private Set<String> parentIncludeMappings;
     private Set<String> descendantIncludeMappings;
     private Set<String> excludeMappings;
+    @SuppressWarnings("rawtypes")
+    private TypeTransformer postTransformer;
 
     public TypeMapperConfigurationBase() {
         super();
@@ -61,6 +64,18 @@ class TypeMapperConfigurationBase implements TypeMapperConfiguration {
     @Override
     public <S, D> TypeConverter<S, D> getTypeConverter(Class<S> sourceType, Class<D> destinationType) {
         return converterRegistry.getConverter(sourceType, destinationType);
+    }
+    
+    
+    @Override
+    public <S, D> void setPostTransformer(TypeTransformer<S,D> transformer) {
+        this.postTransformer = transformer;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <S, D> TypeTransformer<S,D> getPostTransformer() {
+        return postTransformer;
     }
 
     @Override

@@ -63,6 +63,17 @@ We may also want to specify that some properties will be excluded.  Also note th
 In the above code the processor property will be excluded from the mapping.  The exclude mappings currently does not support path selectors, and any descendant property of the ecluded property will also be excluded.
 
 
+### Post Transformation
+You can add a `TypeTransformer` to transform the destination type after the mapping is complete.  You must be careful to return from the type transformer the same type as the destination type.
+
+
+```
+	Double result = new TypeMapper().setPostTransformer(( Integer source, Double dest) -> {
+            return 2.0;
+    }).map(100, Double.class);
+```
+
+
 
 ## Mapping To Map
 The `MapMapper` is provided that offers opinionated type mapping. This type mapper will map a source object to a map, where each collection is converted to a list and any map or java bean is converted to a map.
@@ -83,4 +94,4 @@ We can also map a list of elements to a list of maps
 
 ```
 
-This mapper also supports the configuration options discussed previously such as access level, includes, excludes etc.
+This mapper also supports the configuration options discussed previously such as access level, includes, excludes, transformations etc.

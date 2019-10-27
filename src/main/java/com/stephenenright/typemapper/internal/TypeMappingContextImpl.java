@@ -320,4 +320,8 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
     public TypeMappingToStrategy getTypeMappingToStrategy() {
         return strategy;
     }
+    
+    public boolean hasParentContext() {
+        return parent !=null;
+    }
 }
