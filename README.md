@@ -72,6 +72,14 @@ You can add a `TypeTransformer` to transform the destination type after the mapp
     }).map(100, Double.class);
 ```
 
+### Property Transformation
+We can also add property transformations at the property level
+
+```
+	new TypeMapper().addPropertyTransformer("name", (src, dest, currentSrc, currentDest) -> "Name Transformed")
+                .map(machine, VendingMachineDto.class);
+```
+
 ## Mapping To Map
 The `MapMapper` is provided that offers opinionated type mapping. This type mapper will map a source object to a map, where each collection is converted to a list and any map or java bean is converted to a map.
 Moreover, if the source object to be mapped is not bean, or map, and if the source object is a collection other than a map, it will be mapped to a list of elements with the key `values` in the returned map.  Also, if the source object is not a bean, collection etc it will be mapped as is with the key `value` in the returned map. 

@@ -29,6 +29,8 @@ import com.stephenenright.typemapper.internal.util.ProxyUtils;
 public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
 
     private final Map<String, Object> destinationCache;
+    private Object destinationRoot;
+    private final Object sourceRoot;
     private final S source;
     private final Class<S> sourceType;
     private final Class<D> destinationType;
@@ -45,7 +47,6 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
     private boolean providedDestination;
     private final TypeMappingToStrategy strategy;
 
-    
     public TypeMappingContextImpl(TypeMapperConfiguration configuration, S source, Class<D> destinationType,
             TypeMappingService mappingService, TypeMappingToStrategy strategy) {
         this(configuration, source, ProxyUtils.unProxy(source.getClass()), null, destinationType,
@@ -53,17 +54,19 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
     }
 
     public TypeMappingContextImpl(TypeMapperConfiguration configuration, S source, Class<S> sourceType, D destination,
-            Class<D> destinationType, Type genericDestinationType, TypeMappingService mappingService, TypeMappingToStrategy strategy) {
+            Class<D> destinationType, Type genericDestinationType, TypeMappingService mappingService,
+            TypeMappingToStrategy strategy) {
         AssertUtils.notNull(configuration, "Configuration cannot be null");
-        
+        this.sourceRoot = source;
+        this.source = source;
+        this.sourceType = sourceType;
         this.strategy = strategy;
         this.parent = null;
         this.sourcePath = CommonConstants.EMPTY_STRING;
         this.destinationPath = CommonConstants.EMPTY_STRING;
         this.configuration = configuration;
-        this.source = source;
-        this.sourceType = sourceType;
         this.destination = destination;
+        this.destinationRoot = destination;
         providedDestination = destination != null;
         this.destinationType = destinationType;
         this.genericDestinationType = genericDestinationType;
@@ -97,10 +100,11 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
         TypeMappingContextImpl<?, ?> contextImpl = (TypeMappingContextImpl<?, ?>) context;
 
         this.parent = contextImpl;
-        this.strategy = parent.getTypeMappingToStrategy();
-        this.configuration = context.getConfiguration();
+        this.sourceRoot = contextImpl.getSourceRoot();
         this.source = source;
         this.sourceType = sourceType;
+        this.strategy = parent.getTypeMappingToStrategy();
+        this.configuration = context.getConfiguration();
         this.destination = destination;
         this.providedDestination = contextImpl.providedDestination;
         this.destinationType = destinationType;
@@ -108,9 +112,9 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
         this.mappingService = context.getMappingService();
         this.mapping = mapping;
         this.sourcePath = mapping == null ? contextImpl.sourcePath
-                : PropertyPathUtils.joinPaths(contextImpl.sourcePath,mapping.getSourcePath());
+                : PropertyPathUtils.joinPaths(contextImpl.sourcePath, mapping.getSourcePath());
         this.destinationPath = mapping == null ? contextImpl.destinationPath
-                : PropertyPathUtils.joinPaths(contextImpl.destinationPath,mapping.getDestinationPath());
+                : PropertyPathUtils.joinPaths(contextImpl.destinationPath, mapping.getDestinationPath());
 
         this.processedPaths = inherit ? contextImpl.processedPaths : new LinkedList<String>();
         this.destinationCache = inherit ? contextImpl.destinationCache : new HashMap<String, Object>();
@@ -123,6 +127,10 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
         return source;
     }
 
+    public Object getSourceRoot() {
+        return sourceRoot;
+    }
+
     @Override
     public Class<S> getSourceType() {
         return sourceType;
@@ -131,6 +139,14 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
     @Override
     public D getDestination() {
         return destination;
+    }
+
+    public Object getDestinationRoot() {
+        return destinationRoot;
+    }
+
+    public void setDestinationRoot(Object destination) {
+        this.destinationRoot = destination;
     }
 
     @Override
@@ -151,11 +167,11 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
     public TypeMappingService getMappingService() {
         return mappingService;
     }
-    
+
     public String getSourcePath() {
         return this.sourcePath;
     }
-    
+
     public String getDestinationPath() {
         return this.destinationPath;
     }
@@ -301,8 +317,8 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
     @SuppressWarnings("hiding")
     public <S, D> TypeConverter<S, D> getTypeConverter(Class<S> sourceType, Class<D> destinationType) {
         TypeConverter<S, D> foundConverter = configuration.getTypeConverter(sourceType, destinationType);
-        
-        if(foundConverter!=null) {
+
+        if (foundConverter != null) {
             return foundConverter;
         }
 
@@ -320,8 +336,8 @@ public class TypeMappingContextImpl<S, D> implements TypeMappingContext<S, D> {
     public TypeMappingToStrategy getTypeMappingToStrategy() {
         return strategy;
     }
-    
+
     public boolean hasParentContext() {
-        return parent !=null;
+        return parent != null;
     }
 }

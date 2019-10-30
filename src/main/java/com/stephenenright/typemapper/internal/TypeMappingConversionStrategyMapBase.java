@@ -13,6 +13,7 @@ import java.util.Set;
 
 import com.stephenenright.typemapper.TypeInfo;
 import com.stephenenright.typemapper.TypeInfoRegistry;
+import com.stephenenright.typemapper.TypePropertyTransformer;
 import com.stephenenright.typemapper.internal.collection.Stack;
 import com.stephenenright.typemapper.internal.common.CommonConstants;
 import com.stephenenright.typemapper.internal.common.Pair;
@@ -40,12 +41,12 @@ abstract class TypeMappingConversionStrategyMapBase implements TypeMappingConver
 
         if (ClassUtils.isPrimitive(sourceType)) {
             context.setDestinationPropertyValue(sourceValue, CommonConstants.PROPERTY_NAME_VALUE, sourceValue,
-                    Boolean.FALSE, Boolean.FALSE);
+                    Boolean.FALSE, Boolean.FALSE, ExpectedType.ANY);
         } else if (MapUtils.isMap(sourceType)) {
             mapMap(sourceValue, context);
         } else if (IterableUtils.isIterable(sourceType)) {
             context.setDestinationPropertyValue(sourceValue, CommonConstants.PROPERTY_NAME_VALUES,
-                    new ArrayList<Object>(), Boolean.TRUE, Boolean.FALSE);
+                    new ArrayList<Object>(), Boolean.TRUE, Boolean.FALSE, ExpectedType.LIST);
             if (ArrayUtils.isArray(sourceType)) {
                 mapArray(sourceValue, context);
             } else { // we have a collection
@@ -56,7 +57,7 @@ abstract class TypeMappingConversionStrategyMapBase implements TypeMappingConver
             mapBean(typeInfo, sourceType, sourceValue, context);
         } else { // we have an object we don't recognise so just add it as a value
             context.setDestinationPropertyValue(sourceValue, CommonConstants.PROPERTY_NAME_VALUE, sourceValue,
-                    Boolean.FALSE, Boolean.FALSE);
+                    Boolean.FALSE, Boolean.FALSE, ExpectedType.ANY);
         }
     }
 
@@ -65,7 +66,7 @@ abstract class TypeMappingConversionStrategyMapBase implements TypeMappingConver
             return;
         }
 
-        if (!processPathForProperty(propertyName, sourceValue,context)) {
+        if (!processPathForProperty(propertyName, sourceValue, context)) {
             return;
         }
 
@@ -75,20 +76,20 @@ abstract class TypeMappingConversionStrategyMapBase implements TypeMappingConver
             Object destination = context.getDestinationForSource(sourceValue);
 
             if (destination != null) {
-                context.setDestinationPropertyValue(sourceValue, propertyName, destination, false, Boolean.FALSE);
+                context.setDestinationPropertyValue(sourceValue, propertyName, destination, Boolean.FALSE, Boolean.FALSE,ExpectedType.ANY);
                 return;
             }
         }
 
         if (MapUtils.isMap(sourceType)) {
             Map<String, Object> objectMap = new HashMap<String, Object>();
-            context.setDestinationPropertyValue(sourceValue, propertyName, objectMap, true, Boolean.FALSE);
+            context.setDestinationPropertyValue(sourceValue, propertyName, objectMap, Boolean.TRUE, Boolean.FALSE, ExpectedType.MAP);
             context.pathPush(propertyName);
             mapMap(sourceValue, context);
             context.pathPop();
         } else if (IterableUtils.isIterable(sourceType)) {
             List<Object> objectList = new ArrayList<>();
-            context.setDestinationPropertyValue(sourceValue, propertyName, objectList, true, Boolean.FALSE);
+            context.setDestinationPropertyValue(sourceValue, propertyName, objectList, Boolean.TRUE, Boolean.FALSE, ExpectedType.LIST);
             context.pathPush(propertyName);
 
             if (ArrayUtils.isArray(sourceType)) {
@@ -105,14 +106,14 @@ abstract class TypeMappingConversionStrategyMapBase implements TypeMappingConver
 
             if (!getters.isEmpty()) {
                 Map<String, Object> objectMap = new HashMap<String, Object>();
-                context.setDestinationPropertyValue(sourceValue, propertyName, objectMap, true, Boolean.TRUE);
+                context.setDestinationPropertyValue(sourceValue, propertyName, objectMap, true, Boolean.TRUE, ExpectedType.MAP);
                 context.pathPush(propertyName);
                 mapBean(typeInfo, sourceType, sourceValue, context);
                 context.pathPop();
             }
 
         } else {
-            context.setDestinationPropertyValue(sourceValue, propertyName, sourceValue, false, Boolean.FALSE);
+            context.setDestinationPropertyValue(sourceValue, propertyName, sourceValue, false, Boolean.FALSE, ExpectedType.ANY);
         }
     }
 
@@ -121,7 +122,7 @@ abstract class TypeMappingConversionStrategyMapBase implements TypeMappingConver
             return;
         }
 
-        if (!processPath(context,sourceValue)) {
+        if (!processPath(context, sourceValue)) {
             return;
         }
 
@@ -129,11 +130,11 @@ abstract class TypeMappingConversionStrategyMapBase implements TypeMappingConver
 
         if (MapUtils.isMap(sourceType)) {
             Map<String, Object> objectMap = new HashMap<>();
-            context.setDestinationValue(sourceValue, objectMap, true, Boolean.FALSE);
+            context.setDestinationValue(sourceValue, objectMap, Boolean.TRUE, Boolean.FALSE, ExpectedType.MAP);
             mapMap(sourceValue, context);
         } else if (IterableUtils.isIterable(sourceType)) {
             List<Object> objectList = new ArrayList<>();
-            context.setDestinationValue(sourceValue, objectList, true, Boolean.FALSE);
+            context.setDestinationValue(sourceValue, objectList, Boolean.TRUE, Boolean.FALSE, ExpectedType.LIST);
 
             if (ArrayUtils.isArray(sourceType)) {
                 mapArray(sourceValue, context);
@@ -148,11 +149,11 @@ abstract class TypeMappingConversionStrategyMapBase implements TypeMappingConver
 
             if (!getters.isEmpty()) {
                 Map<String, Object> objectMap = new HashMap<String, Object>();
-                context.setDestinationValue(sourceValue, objectMap, true, Boolean.TRUE);
+                context.setDestinationValue(sourceValue, objectMap, Boolean.TRUE, Boolean.TRUE, ExpectedType.MAP);
                 mapBean(typeInfo, sourceType, sourceValue, context);
             }
         } else {
-            context.setDestinationValue(sourceValue, sourceValue, false, Boolean.FALSE);
+            context.setDestinationValue(sourceValue, sourceValue, Boolean.FALSE, Boolean.FALSE, ExpectedType.ANY);
         }
 
     }
@@ -203,11 +204,13 @@ abstract class TypeMappingConversionStrategyMapBase implements TypeMappingConver
 
     private boolean processPathForProperty(String propertyName, Object value, ConversionContext<?> context) {
         final String propertyPath = PropertyPathUtils.joinPaths(context.getCurrentPropertyPath(), propertyName);
-        return context.getMappingContext().getConfiguration().isMappingIncluded(context.getCurrentPropertyPath(), propertyPath, value, typeInfoRegistry);
+        return context.getMappingContext().getConfiguration().isMappingIncluded(context.getCurrentPropertyPath(),
+                propertyPath, value, typeInfoRegistry);
     }
 
-    private boolean processPath(ConversionContext<?> context,  Object value) {
-        return context.getMappingContext().getConfiguration().isMappingIncluded(context.getCurrentPropertyPathParent(), context.getCurrentPropertyPath(), value, typeInfoRegistry);
+    private boolean processPath(ConversionContext<?> context, Object value) {
+        return context.getMappingContext().getConfiguration().isMappingIncluded(context.getCurrentPropertyPathParent(),
+                context.getCurrentPropertyPath(), value, typeInfoRegistry);
     }
 
     protected abstract static class ConversionContext<T> {
@@ -289,7 +292,7 @@ abstract class TypeMappingConversionStrategyMapBase implements TypeMappingConver
                 return getCurrentPath();
             } else {
                 Pair<String, String> pathPair = PropertyPathUtils.joinPathsWithParent(path, indexPropertiesSet);
-                currentPropertyParentPath = pathPair.getValue1(); 
+                currentPropertyParentPath = pathPair.getValue1();
                 currentPropertyPath = pathPair.getValue2();
                 return currentPropertyPath;
             }
@@ -315,20 +318,39 @@ abstract class TypeMappingConversionStrategyMapBase implements TypeMappingConver
 
         @SuppressWarnings("unchecked")
         public void setDestinationPropertyValue(Object sourceValue, String propertyName, Object value,
-                Boolean setParent, Boolean trackSource) {
-
-            // TODO add includes, excludes, custom conversion etc
+                Boolean setParent, Boolean trackSource, ExpectedType expectedType) {
 
             final String parentPath = getCurrentPath();
+            Object valueToSet = value;
+            Object parent = null;
+            boolean isParentRoot = false;
 
             if (parentPath.equals(CommonConstants.EMPTY_STRING)) {
-                setRootObjectPropertyValue(propertyName, value);
-            } else {
-                Object parent = pathToDestinationObjectCache.get(parentPath);
+                parent = destinationRoot;
+                isParentRoot = true;
 
+            } else {
+                parent = pathToDestinationObjectCache.get(parentPath);
+            }
+
+            if (parent == null) {
+                return;
+            }
+
+            final String propertyPath = PropertyPathUtils.joinPaths(getCurrentPropertyPath(), propertyName);
+            TypePropertyTransformer transformer = mappingContext.getConfiguration()
+                    .getPropertyTransformer(propertyPath);
+
+            if (transformer != null) {
+                valueToSet = transform(propertyPath, transformer, parent, sourceValue, expectedType);
+            }
+
+            if (isParentRoot) {
+                setRootObjectPropertyValue(propertyName, valueToSet);
+            } else {
                 if (parent instanceof Map) {
                     Map<String, Object> parentMap = (Map<String, Object>) parent;
-                    parentMap.put(propertyName, value);
+                    parentMap.put(propertyName, valueToSet);
                 }
             }
 
@@ -342,9 +364,7 @@ abstract class TypeMappingConversionStrategyMapBase implements TypeMappingConver
         }
 
         @SuppressWarnings({ "rawtypes", "unchecked" })
-        public void setDestinationValue(Object sourceValue, Object value, boolean setParent, Boolean trackSource) {
-            // TODO add includes, excludes, custom conversion etc
-
+        public void setDestinationValue(Object sourceValue, Object value, boolean setParent, Boolean trackSource, ExpectedType expectedType) {
             final String parentPath = getCurrentPath();
 
             Object parent = pathToDestinationObjectCache.get(parentPath);
@@ -362,6 +382,21 @@ abstract class TypeMappingConversionStrategyMapBase implements TypeMappingConver
                     parent = destinationRoot;
                 }
             }
+            
+            if(parent==null) {
+                return;
+            }
+            
+            Object valueToSet = value;
+            String propertyPath = getCurrentPropertyPath();
+            
+            TypePropertyTransformer transformer = mappingContext.getConfiguration()
+                    .getPropertyTransformer(propertyPath);
+
+            if (transformer != null) {
+                valueToSet = transform(propertyPath, transformer, parent, sourceValue, expectedType);
+            }
+            
 
             if (!ListUtils.isList(parent)) {
                 throw new Errors()
@@ -372,17 +407,35 @@ abstract class TypeMappingConversionStrategyMapBase implements TypeMappingConver
             }
 
             List parentList = (List) parent;
-            parentList.add(value);
+            parentList.add(valueToSet);
 
             if (setParent) {
                 if (!pathToDestinationObjectCache.containsKey(parentPath)) {
-                    pathToDestinationObjectCache.put(parentPath, value);
+                    pathToDestinationObjectCache.put(parentPath, valueToSet);
                 }
             }
 
             if (trackSource && !sourceToDestination.containsKey(sourceValue)) {
-                sourceToDestination.put(sourceValue, value);
+                sourceToDestination.put(sourceValue, valueToSet);
             }
+        }
+
+        private Object transform(String propertyPath, TypePropertyTransformer transformer, Object parent,
+                Object sourceValue, ExpectedType expectedType) {
+            Object result = transformer.tranform(mappingContext.getSourceRoot(), getBuildingDestination(), sourceValue,
+                    parent);
+
+            if (result != null) {
+                if (expectedType == ExpectedType.LIST && !ListUtils.isList(result)) {
+                    new Errors().errorMappingPropertyTransformation(propertyPath, List.class, result.getClass())
+                            .toMappingException();
+                } else if (expectedType == ExpectedType.MAP && !MapUtils.isMap(result.getClass())) {
+                    new Errors().errorMappingPropertyTransformation(propertyPath, Map.class, result.getClass())
+                            .toMappingException();
+                }
+            }
+
+            return result;
         }
 
         public Object getDestinationForSource(Object source) {
@@ -397,5 +450,13 @@ abstract class TypeMappingConversionStrategyMapBase implements TypeMappingConver
         }
 
         protected abstract void setRootObjectPropertyValue(String propertyName, Object value);
+
+        public abstract Object getBuildingDestination();
+
     }
+
+    private static enum ExpectedType {
+        LIST, MAP, ANY
+    }
+
 }

@@ -3,6 +3,7 @@ package com.stephenenright.typemapper.internal;
 import java.lang.reflect.Type;
 
 import com.stephenenright.typemapper.TypeInfoRegistry;
+import com.stephenenright.typemapper.TypePropertyTransformer;
 import com.stephenenright.typemapper.converter.TypeConverter;
 import com.stephenenright.typemapper.exception.TypeMappingException;
 import com.stephenenright.typemapper.internal.common.error.Errors;
@@ -97,6 +98,10 @@ public class TypeMappingConversionStrategyObjectImpl extends TypeMappingConversi
             if (destination == null) {
                 return null;
             }
+
+            if (!context.hasParentContext()) {
+                context.setDestinationRoot(destination);
+            }
         }
 
         for (TypeMapping mapping : typeMap.getTypeMappings()) {
@@ -150,7 +155,8 @@ public class TypeMappingConversionStrategyObjectImpl extends TypeMappingConversi
     private <S, D> void setDestinationValue(TypeMapping mapping, TypeMappingContextImpl<Object, Object> propertyContext,
             TypeMappingContextImpl<S, D> context) {
 
-        String destinationPath = context.getDestinationPath() + mapping.getDestinationPath();
+        String destinationPath = PropertyPathUtils.joinPaths(context.getDestinationPath(),
+                mapping.getDestinationPath());
 
         TypeConverter<Object, Object> converter = (TypeConverter<Object, Object>) mapping.getConverter();
 
@@ -164,26 +170,48 @@ public class TypeMappingConversionStrategyObjectImpl extends TypeMappingConversi
             return;
         }
 
-        // now we have parent destination object resolved set the actual value
         TypePropertySetter setter = ListUtils.getLastElement(mapping.getDestinationSetters());
-        TypePropertyGetter getter = typePropertyInfoRegistry.getterFor(setter.getTypeInDeclaringClass(),
-                setter.getName(), context.getConfiguration());
+        TypePropertyTransformer transformer = context.getConfiguration().getPropertyTransformer(destinationPath);
 
         Object destinationValue = null;
-        if (propertyContext.isProvidedDestination() && getter != null) {
-            destinationValue = getter.getValue(destination);
-            propertyContext.setDestination(destinationValue, true);
-        }
 
-        if (converter != null) {
-            destinationValue = convertWithTypeConverter(propertyContext, converter);
-        } else if (propertyContext.getSource() != null) {
-            destinationValue = map(propertyContext);
-        } else {
-            converter = getTypeConverterFromContext(propertyContext);
+        if (transformer != null) { // do a custom transformation
+            destinationValue = transformer.tranform(propertyContext.getSourceRoot(),
+                    propertyContext.getDestinationRoot(), propertyContext.getSource(), destination);
+
+            if (destinationValue != null) {
+                Class<?> expectedDestinationType = setter.getType();
+
+                if (!expectedDestinationType.isAssignableFrom(destinationValue.getClass())) {
+                    // TODO consider converting the types with a type converter
+                    throw new Errors().errorMappingPropertyTransformation(destinationPath, expectedDestinationType,
+                            destinationValue.getClass()).toMappingException();
+
+                }
+
+            }
+        } else { // no transformer so do normal mapping
+
+            // now we have parent destination object resolved set the actual value
+            TypePropertyGetter getter = typePropertyInfoRegistry.getterFor(setter.getTypeInDeclaringClass(),
+                    setter.getName(), context.getConfiguration());
+
+            if (propertyContext.isProvidedDestination() && getter != null) {
+                destinationValue = getter.getValue(destination);
+                propertyContext.setDestination(destinationValue, true);
+            }
+
             if (converter != null) {
                 destinationValue = convertWithTypeConverter(propertyContext, converter);
+            } else if (propertyContext.getSource() != null) {
+                destinationValue = map(propertyContext);
+            } else {
+                converter = getTypeConverterFromContext(propertyContext);
+                if (converter != null) {
+                    destinationValue = convertWithTypeConverter(propertyContext, converter);
+                }
             }
+
         }
 
         context.addDestinationToCache(destinationPath, destinationValue);

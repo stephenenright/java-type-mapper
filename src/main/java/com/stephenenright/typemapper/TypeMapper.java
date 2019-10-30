@@ -48,5 +48,14 @@ public class TypeMapper {
         configuration.setPostTransformer(postTransformer);
         return this;
     }
+    
+    public TypeMapper addPropertyTransformer(String property, TypePropertyTransformer transformer) {
+        configuration.addPropertyTransformer(property, transformer);
+        return this;
+    }
+    
+    
+    
+    
 
 }

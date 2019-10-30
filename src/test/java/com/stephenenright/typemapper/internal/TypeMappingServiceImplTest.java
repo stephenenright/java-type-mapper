@@ -13,12 +13,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.stephenenright.typemapper.DefaultMapperConfiguration;
 import com.stephenenright.typemapper.MapMapperConfiguration;
+import com.stephenenright.typemapper.TypeMapper;
 import com.stephenenright.typemapper.internal.common.CommonConstants;
 import com.stephenenright.typemapper.test.dto.vending.PaymentGatewayDto;
 import com.stephenenright.typemapper.test.dto.vending.PaymentProcessorDto;
@@ -249,8 +251,46 @@ public class TypeMappingServiceImplTest {
             assertTrue(expectedProductIds.isEmpty());
         }
     }
+    
+    @Test
+    public void map_withPropertyTransforms() {
+        VendingMachine machine = createVendingMachine("V1", "Vending Machine 1");
 
-   
+        
+        DefaultMapperConfiguration mapperConfig = DefaultMapperConfiguration.create();
+        mapperConfig.addPropertyTransformer("name", (src, dest, currentSrc, currentDest) -> {
+            return "Vending Machine Transformed";
+        });
+        mapperConfig.addPropertyTransformer("slots", (src, dest, currentSrc, currentDest) -> {
+            return new LinkedList<>();
+        });
+     
+        VendingMachineDto result = mappingService.map(machine, VendingMachineDto.class, mapperConfig);
+        assertNotNull(result);
+        assertEquals("V1", result.getId());
+        assertEquals("Vending Machine Transformed", result.getName());
+        assertEquals(true, result.isDeleted());
+
+        assertTrue(!result.getConfiguration().isEmpty());
+        assertTrue((Boolean) result.getConfiguration().get("shutdownWhenEmpty"));
+        assertFalse((Boolean) result.getConfiguration().get("exactAmountRequired"));
+
+        PaymentProcessorDto processorDto = result.getProcessor();
+        assertEquals("P1", processorDto.getId());
+        assertEquals("PRO Name 1", processorDto.getName());
+        assertEquals(false, processorDto.isDeleted());
+
+        PaymentGatewayDto gatewayDto = processorDto.getGateway();
+        assertNotNull(gatewayDto);
+        assertEquals("Gateway 1", gatewayDto.getId());
+        assertEquals(false, gatewayDto.isDeleted());
+
+        List<SlotDto> slotsDto = result.getSlots();
+        assertNotNull(slotsDto);
+        assertTrue(slotsDto.size() == 0);
+
+    }
+    
     @Test
     public void mapToMap_String() {
         String expectedValue = "This is a String";
@@ -385,6 +425,10 @@ public class TypeMappingServiceImplTest {
         MapMapperConfiguration mapperConfig = MapMapperConfiguration.create();
         mapperConfig.addIncludeMapping("*", "configuration.**", "processor.*", "slots.**" );
         mapperConfig.addExcludeMapping("processor");
+        mapperConfig.addPropertyTransformer("name", (src,dest, currentSrc,currentDest) -> {
+            return "Name Transformed";
+        });
+       
         mapperConfig.setPostTransformer((VendingMachine source, Map<String,Object> dest) -> {
             dest.put("addedValue", "addedValue");
             return dest;
@@ -395,7 +439,7 @@ public class TypeMappingServiceImplTest {
         assertFalse(result.isEmpty());
 
         assertEquals("V1", result.get("id"));
-        assertEquals("Vending Machine 1", result.get("name"));
+        assertEquals("Name Transformed", result.get("name"));
         assertEquals(true, result.get("deleted"));
         assertEquals("addedValue", result.get("addedValue"));
         
@@ -417,8 +461,7 @@ public class TypeMappingServiceImplTest {
         assertEquals("on button", onButton);
 
         assertFalse(result.containsKey("processor"));
-        
-        
+  
         List<Object> slots = (List<Object>) result.get("slots");
         assertNotNull(slots);
         assertTrue(slots.size() == 10);

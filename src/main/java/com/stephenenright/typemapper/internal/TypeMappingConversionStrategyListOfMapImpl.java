@@ -10,12 +10,11 @@ import com.stephenenright.typemapper.internal.common.error.Errors;
 import com.stephenenright.typemapper.internal.util.ListUtils;
 
 /**
- * Opinionated TypeMappingConversionStrategy that converts a source list of object to
- * a list of maps
+ * Opinionated TypeMappingConversionStrategy that converts a source list of
+ * object to a list of maps
  */
 public class TypeMappingConversionStrategyListOfMapImpl extends TypeMappingConversionStrategyMapBase
         implements TypeMappingConversionStrategy {
-
 
     public TypeMappingConversionStrategyListOfMapImpl(TypeInfoRegistry typeInfoRegistry) {
         super(typeInfoRegistry);
@@ -25,38 +24,40 @@ public class TypeMappingConversionStrategyListOfMapImpl extends TypeMappingConve
     @Override
     public <S, D> D map(TypeMappingContextImpl<S, D> context) {
         S source = context.getSource();
-        
-        if(source==null) {
+
+        if (source == null) {
             return null;
         }
-        
-        if(!ListUtils.isList(source)) {
-            throw new Errors().errorGeneral("Unable to map to List<Map<String,Object>> source object must be a java.util.List").toMappingException();
+
+        if (!ListUtils.isList(source)) {
+            throw new Errors()
+                    .errorGeneral("Unable to map to List<Map<String,Object>> source object must be a java.util.List")
+                    .toMappingException();
         }
 
         List<?> sourceObjectList = (List<?>) (source);
-        
-        if(sourceObjectList.isEmpty()) {
-            return (D) new ArrayList<Map<String,Object>>();
+
+        if (sourceObjectList.isEmpty()) {
+            return (D) new ArrayList<Map<String, Object>>();
         }
-        
+
         ConversionContextList conversionContext = new ConversionContextList(context);
-        
-        for(Object sourceObject : sourceObjectList) {
-            if(sourceObject !=null) {
+
+        for (Object sourceObject : sourceObjectList) {
+            if (sourceObject != null) {
                 conversionContext.initBuildingObject();
             }
             mapFromSourceRoot(sourceObject, conversionContext);
             conversionContext.resetAfterObjectBuilt();
         }
-        
+
         return (D) conversionContext.getDestinationRoot();
     }
 
-    private static class ConversionContextList extends ConversionContext<List<Map<String,Object>>> {
-        
-        private Map<String,Object> buildingObject;
-        
+    private static class ConversionContextList extends ConversionContext<List<Map<String, Object>>> {
+
+        private Map<String, Object> buildingObject;
+
         public ConversionContextList(TypeMappingContextImpl<?, ?> mappingContext) {
             super(mappingContext);
             destinationRoot = new ArrayList<>();
@@ -66,27 +67,32 @@ public class TypeMappingConversionStrategyListOfMapImpl extends TypeMappingConve
         protected void setRootObjectPropertyValue(String propertyName, Object value) {
             buildingObject.put(propertyName, value);
         }
-    
+
         public void initBuildingObject() {
             buildingObject = new HashMap<String, Object>();
         }
-        
+
         public void resetAfterObjectBuilt() {
             pathToDestinationObjectCache.clear();
             path.clear();
-            
-            if(indexPropertiesSet!=null) {
+
+            if (indexPropertiesSet != null) {
                 indexPropertiesSet = null;
             }
-            
+
             hasIndexedProperty = false;
-  
+
             resetCachedPaths();
-           
+
             sourceToDestination.clear();
             destinationRoot.add(buildingObject);
             buildingObject = null;
         }
-         
+
+        @Override
+        public Object getBuildingDestination() {
+            return buildingObject;
+        }
+
     }
 }

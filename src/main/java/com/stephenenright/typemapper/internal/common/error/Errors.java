@@ -62,6 +62,14 @@ public class Errors {
         return addError(new ErrorDetail(message, t));
     }
 
+    public Errors errorMappingPropertyTransformation(String property, Class<?> expectedDestinationType,
+            Class<?> destinationType) {
+        String message = String.format(
+                "Mapping failed for transformation for property %s as type: %s is not assignable to %s ", property,
+                destinationType.getName(), expectedDestinationType.getName());
+        return addError(new ErrorDetail(message));
+    }
+
     public Errors errorGeneral(String message) {
         return addError(new ErrorDetail(message, null));
     }

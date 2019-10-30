@@ -34,16 +34,26 @@ public interface TypeMapperConfiguration {
     public <S, D> void addTypeConverterFactory(TypeConverterFactory<S, D> factory);
 
     /**
+     * Adds a transformer to transform the given property path
+     */
+    public void addPropertyTransformer(String propertyPath, TypePropertyTransformer transformer);
+
+    /**
+     * Returns a <code>TypePropertyTransformer</code> if it exists, otherwise null
+     */
+    public TypePropertyTransformer getPropertyTransformer(String propertyPath);
+
+    /**
      * Adds a post transformer that allows the transformation of the mapped
      * destination after the mapping is complete
      * 
      */
-    public <S, D> void setPostTransformer(TypeTransformer<S,D> transformer);
+    public <S, D> void setPostTransformer(TypeTransformer<S, D> transformer);
 
     /**
      * Returns the configured post transformer
      */
-    public <S, D> TypeTransformer<S,D> getPostTransformer();
+    public <S, D> TypeTransformer<S, D> getPostTransformer();
 
     /**
      * Returns a type converter for the given source and destination type

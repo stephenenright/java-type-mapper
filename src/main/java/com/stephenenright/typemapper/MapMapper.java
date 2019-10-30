@@ -41,4 +41,9 @@ public class MapMapper {
         return this;
     }
 
+    public MapMapper addPropertyTransformer(String property, TypePropertyTransformer transformer) {
+        configuration.addPropertyTransformer(property, transformer);
+        return this;
+    }
+
 }

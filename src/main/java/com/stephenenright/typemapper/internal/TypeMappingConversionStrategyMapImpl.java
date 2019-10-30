@@ -29,7 +29,7 @@ public class TypeMappingConversionStrategyMapImpl extends TypeMappingConversionS
         mapFromSourceRoot(sourceValue, conversionContext);
         return (D) conversionContext.getDestinationRoot();
     }
-    
+
     private static class ConversionContextImpl extends ConversionContext<Map<String, Object>> {
 
         public ConversionContextImpl(TypeMappingContextImpl<?, ?> mappingContext) {
@@ -41,6 +41,11 @@ public class TypeMappingConversionStrategyMapImpl extends TypeMappingConversionS
         protected void setRootObjectPropertyValue(String propertyName, Object value) {
             destinationRoot.put(propertyName, value);
 
+        }
+
+        @Override
+        public Object getBuildingDestination() {
+            return destinationRoot;
         }
     }
 }
