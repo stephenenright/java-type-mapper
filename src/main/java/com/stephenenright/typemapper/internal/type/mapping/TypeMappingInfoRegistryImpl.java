@@ -12,28 +12,29 @@ public class TypeMappingInfoRegistryImpl implements TypeMappingInfoRegistry {
             256);
 
     private final TypeMappingBuilder typeMappingBuilder;
-    
+
     public TypeMappingInfoRegistryImpl(TypeMappingBuilder typeMappingBuilder) {
         this.typeMappingBuilder = typeMappingBuilder;
     }
-    
 
-    
     @SuppressWarnings("unchecked")
     @Override
     public <S, D> TypeMappingInfo<S, D> getOrRegister(S source, Class<S> sourceType, Class<D> destinationType,
             TypeMappingService mappingService, TypeMappingContextImpl<S, D> contextImpl) {
         TypeMappingKey<S, D> key = new TypeMappingKey<S, D>(sourceType, destinationType);
         TypeMappingInfo<S, D> mappingInfo = (TypeMappingInfo<S, D>) typeMappingInfoCache.get(key);
-        
-        if(mappingInfo!=null) {
+
+        if (mappingInfo != null) {
             return mappingInfo;
         }
-        
+
         mappingInfo = new TypeMappingInfoImpl<S, D>(sourceType, destinationType, contextImpl.getConfiguration());
         typeMappingBuilder.buildMappings(source, mappingInfo, contextImpl, this);
-        typeMappingInfoCache.put(key, mappingInfo);
-  
+
+        if (mappingInfo.isCacheable()) {
+            typeMappingInfoCache.put(key, mappingInfo);
+        }
+
         return mappingInfo;
     }
 

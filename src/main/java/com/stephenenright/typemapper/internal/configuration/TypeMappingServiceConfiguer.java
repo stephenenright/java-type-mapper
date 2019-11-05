@@ -40,7 +40,7 @@ public abstract class TypeMappingServiceConfiguer {
 
         TypePropertyInfoCollector typePropertyInfoCollector = new TypePropertyInfoCollectorImpl(
                 configuration.getIntrospector());
-
+        
         TypeInfoCreator typeInfoCreator = new TypeInfoCreatorDefaultImpl(typePropertyInfoCollector);
 
         TypeInfoRegistry typeInfoRegistry = new TypeInfoRegistryImpl(typeInfoCreator);

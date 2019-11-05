@@ -18,7 +18,11 @@ public interface TypeMappingInfo<S, D> {
     public TypeConverter<S, D> getConverter();
 
     public void addMapping(TypeMapping mapping);
-    
+
     public void addMappings(List<TypeMapping> mappings);
+
+    public boolean isCacheable();
+    
+    public void setCacheable(boolean cacheable);
 
 }

@@ -3,6 +3,10 @@ package com.stephenenright.typemapper.internal.type.info;
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 
+import com.stephenenright.typemapper.TypeInfo;
+import com.stephenenright.typemapper.TypeInfoRegistry;
+import com.stephenenright.typemapper.TypeMapperConfiguration;
+import com.stephenenright.typemapper.internal.util.ClassUtils;
 import com.stephenenright.typemapper.internal.util.TypeUtils;
 
 abstract class TypePropertyInfoBase<M extends Member> implements TypePropertyInfo {
@@ -11,12 +15,14 @@ abstract class TypePropertyInfoBase<M extends Member> implements TypePropertyInf
     protected String name;
     protected Class<?> type;
     protected final M member;
+    protected TypeInfoRegistry typeInfoRegistry;
 
-    public TypePropertyInfoBase(String name, Class<?> type, M member) {
+    public TypePropertyInfoBase(String name, Class<?> type, M member, TypeInfoRegistry typeInfoRegistry) {
         this.typeInDeclaringClass = type;
         this.name = name;
         this.member = member;
         this.type = resolveType(type);
+        this.typeInfoRegistry = typeInfoRegistry;
     }
 
     public String getName() {
@@ -41,10 +47,15 @@ abstract class TypePropertyInfoBase<M extends Member> implements TypePropertyInf
         Type genericType = getGenericType();
 
         if (genericType == null) {
-            return type;
+            return ClassUtils.resolvePrimitiveAsWrapperIfNessecary(type);
         }
 
-        return TypeUtils.resolveRawClass(genericType, type);
+        return ClassUtils.resolvePrimitiveAsWrapperIfNessecary(TypeUtils.resolveRawClass(genericType, type));
 
+    }
+
+    @Override
+    public TypeInfo<?> getTypeInfo(TypeMapperConfiguration configuration) {
+        return typeInfoRegistry.get(type, configuration);
     }
 }

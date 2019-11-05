@@ -13,8 +13,10 @@ import org.junit.Test;
 
 import com.stephenenright.typemapper.DefaultMapperConfiguration;
 import com.stephenenright.typemapper.TypeInfo;
+import com.stephenenright.typemapper.TypeInfoRegistry;
 import com.stephenenright.typemapper.TypeIntrospector;
 import com.stephenenright.typemapper.TypeMapperConfiguration;
+import com.stephenenright.typemapper.test.fixture.utils.FixtureUtils;
 import com.stephenenright.typemapper.test.models.vending.PaymentProcessor;
 import com.stephenenright.typemapper.test.models.vending.VendingMachine;
 import com.stephenenright.typemapper.test.models.vending.VendingMachineStatus;
@@ -22,11 +24,14 @@ import com.stephenenright.typemapper.test.models.vending.VendingMachineStatus;
 public class TypeInfoCreatorImplTest {
 
     private TypeInfoCreatorDefaultImpl creator;
+    private TypeInfoRegistry typeInfoRegistry;
 
     @Before
     public void setup() {
         TypeIntrospector introspector = new TypeIntrospectorImpl();
         creator = new TypeInfoCreatorDefaultImpl(new TypePropertyInfoCollectorImpl(introspector));
+        typeInfoRegistry = FixtureUtils.createTypeInfoRegistry(creator);
+
     }
 
     @Test
@@ -45,7 +50,7 @@ public class TypeInfoCreatorImplTest {
         expectedSetterMap.put("status", VendingMachineStatus.class);
 
         TypeMapperConfiguration configuration = DefaultMapperConfiguration.create();
-        TypeInfo<VendingMachine> typeInfo = creator.create(VendingMachine.class, configuration);
+        TypeInfo<VendingMachine> typeInfo = creator.create(null, VendingMachine.class, configuration, typeInfoRegistry);
 
         assertNotNull(typeInfo);
         assertEquals(VendingMachine.class, typeInfo.getType());

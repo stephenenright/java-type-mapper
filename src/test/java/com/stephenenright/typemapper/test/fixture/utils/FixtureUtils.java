@@ -15,6 +15,7 @@ import com.stephenenright.typemapper.internal.TypeMappingToStrategy;
 import com.stephenenright.typemapper.internal.conversion.TypeConverterCollectionDefaultImpl;
 import com.stephenenright.typemapper.internal.conversion.TypeConverterRegistry;
 import com.stephenenright.typemapper.internal.conversion.TypeConverterRegistryImpl;
+import com.stephenenright.typemapper.internal.type.info.TypeInfoCreator;
 import com.stephenenright.typemapper.internal.type.info.TypeInfoCreatorDefaultImpl;
 import com.stephenenright.typemapper.internal.type.info.TypeInfoRegistryImpl;
 import com.stephenenright.typemapper.internal.type.info.TypeIntrospectorImpl;
@@ -27,7 +28,8 @@ import com.stephenenright.typemapper.internal.type.mapping.TypeMappingInfoRegist
 
 public abstract class FixtureUtils {
 
-    public static <S, D> TypeMappingContextImpl<S, D> createMappingContext(S source, Class<D> destinationType, TypeMapperConfiguration configuration) {
+    public static <S, D> TypeMappingContextImpl<S, D> createMappingContext(S source, Class<D> destinationType,
+            TypeMapperConfiguration configuration) {
         return new TypeMappingContextImpl<S, D>(configuration, source, destinationType,
                 FixtureUtils.createDefaultMappingService(), TypeMappingToStrategy.OBJECT);
     }
@@ -56,6 +58,10 @@ public abstract class FixtureUtils {
     public static TypeInfoRegistryImpl createTypeInfoRegistry() {
         return new TypeInfoRegistryImpl(
                 new TypeInfoCreatorDefaultImpl(new TypePropertyInfoCollectorImpl(new TypeIntrospectorImpl())));
+    }
+    
+    public static TypeInfoRegistryImpl createTypeInfoRegistry(TypeInfoCreator infoCreator) {
+        return new TypeInfoRegistryImpl(infoCreator);
     }
 
     public static TypePropertyInfoRegistryImpl createPropertyInfoRegistry(TypeInfoRegistry infoRegistry) {

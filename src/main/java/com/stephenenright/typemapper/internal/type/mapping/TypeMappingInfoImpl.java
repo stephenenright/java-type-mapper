@@ -13,6 +13,7 @@ public class TypeMappingInfoImpl<S, D> implements TypeMappingInfo<S, D> {
     private final TypeMapperConfiguration configuration;
     private TypeConverter<S, D> converter;
     private List<TypeMapping> mappings;
+    private boolean isCacheable;
 
     public TypeMappingInfoImpl(Class<S> sourceType, Class<D> destinationType, TypeMapperConfiguration configuration) {
         this.sourceType = sourceType;
@@ -40,15 +41,15 @@ public class TypeMappingInfoImpl<S, D> implements TypeMappingInfo<S, D> {
     public List<TypeMapping> getTypeMappings() {
         return mappings;
     }
-    
+
     @Override
     public void addMapping(TypeMapping mapping) {
         this.mappings.add(mapping);
     }
-    
+
     @Override
     public void addMappings(List<TypeMapping> mappings) {
-        for(TypeMapping mapping: mappings) {
+        for (TypeMapping mapping : mappings) {
             this.mappings.add(mapping);
         }
     }
@@ -60,6 +61,14 @@ public class TypeMappingInfoImpl<S, D> implements TypeMappingInfo<S, D> {
 
     public void setConverter(TypeConverter<S, D> converter) {
         this.converter = converter;
+    }
+
+    public boolean isCacheable() {
+        return isCacheable;
+    }
+
+    public void setCacheable(boolean isCacheable) {
+        this.isCacheable = isCacheable;
     }
 
 }

@@ -37,12 +37,12 @@ public class TypeMappingBuilderImplTest {
     @Test
     public void buildMapping() {
         Map<String, String> expectedMappings = new HashMap<String, String>();
-        expectedMappings.put("PaymentProcessor.id", "PaymentProcessorDto.id");
-        expectedMappings.put("PaymentProcessor.name", "PaymentProcessorDto.name");
-        expectedMappings.put("PaymentProcessor.deleted", "PaymentProcessorDto.deleted");
-        expectedMappings.put("PaymentProcessor.gateway.deleted", "PaymentProcessorDto.gateway.deleted");
-        expectedMappings.put("PaymentProcessor.gateway.name", "PaymentProcessorDto.gateway.name");
-        expectedMappings.put("PaymentProcessor.gateway.id", "PaymentProcessorDto.gateway.id");
+        expectedMappings.put("id", "id");
+        expectedMappings.put("name", "name");
+        expectedMappings.put("deleted", "deleted");
+        expectedMappings.put("gateway.deleted", "gateway.deleted");
+        expectedMappings.put("gateway.name", "gateway.name");
+        expectedMappings.put("gateway.id", "gateway.id");
 
         TypeMapperConfiguration configuration = DefaultMapperConfiguration.create();
         PaymentProcessor sourceObject = new PaymentProcessor();
@@ -70,22 +70,20 @@ public class TypeMappingBuilderImplTest {
         
         
         expectedMappings = new HashMap<String, String>();
-        expectedMappings.put("VendingMachine.id", "VendingMachineDto.id");
-        expectedMappings.put("VendingMachine.slots", "VendingMachineDto.slots");
-        expectedMappings.put("VendingMachine.deleted", "VendingMachineDto.deleted");
-        expectedMappings.put("VendingMachine.name", "VendingMachineDto.name");
-        expectedMappings.put("VendingMachine.configuration", "VendingMachineDto.configuration");
-        expectedMappings.put("VendingMachine.status", "VendingMachineDto.status");
-        expectedMappings.put("VendingMachine.processor.gateway", "VendingMachineDto.processor.gateway");
-        expectedMappings.put("VendingMachine.processor.deleted", "VendingMachineDto.processor.deleted");
-        expectedMappings.put("VendingMachine.processor.name", "VendingMachineDto.processor.name");
-        expectedMappings.put("VendingMachine.processor.id", "VendingMachineDto.processor.id");
-        expectedMappings.put("VendingMachine.processor.gateway", "VendingMachineDto.processor.gateway");
-        expectedMappings.put("VendingMachine.processor.gateway.deleted", "VendingMachineDto.processor.gateway.deleted");
-        expectedMappings.put("VendingMachine.processor.gateway.name", "VendingMachineDto.processor.gateway.name");
-        expectedMappings.put("VendingMachine.processor.gateway.id", "VendingMachineDto.processor.gateway.id");
-        
-        
+        expectedMappings.put("id", "id");
+        expectedMappings.put("slots", "slots");
+        expectedMappings.put("deleted", "deleted");
+        expectedMappings.put("name", "name");
+        expectedMappings.put("configuration", "configuration");
+        expectedMappings.put("status", "status");
+        expectedMappings.put("processor.gateway", "processor.gateway");
+        expectedMappings.put("processor.deleted", "processor.deleted");
+        expectedMappings.put("processor.name", "processor.name");
+        expectedMappings.put("processor.id", "processor.id");
+        expectedMappings.put("processor.gateway", "processor.gateway");
+        expectedMappings.put("processor.gateway.deleted", "processor.gateway.deleted");
+        expectedMappings.put("processor.gateway.name", "processor.gateway.name");
+        expectedMappings.put("processor.gateway.id", "processor.gateway.id");
         
         VendingMachine vendingMachine = new VendingMachine();
         TypeMappingContextImpl<VendingMachine,VendingMachineDto> contextImpl2 = 

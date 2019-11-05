@@ -3,6 +3,9 @@ package com.stephenenright.typemapper.internal.type.info;
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 
+import com.stephenenright.typemapper.TypeInfo;
+import com.stephenenright.typemapper.TypeMapperConfiguration;
+
 public interface TypePropertyInfo {
 
     /**
@@ -29,5 +32,7 @@ public interface TypePropertyInfo {
     public Type getGenericType();
 
     public Member getMember();
+
+    public TypeInfo<?> getTypeInfo(TypeMapperConfiguration configuration);
 
 }

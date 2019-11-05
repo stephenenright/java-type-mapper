@@ -13,14 +13,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.stephenenright.typemapper.DefaultMapperConfiguration;
 import com.stephenenright.typemapper.MapMapperConfiguration;
-import com.stephenenright.typemapper.TypeMapper;
 import com.stephenenright.typemapper.internal.common.CommonConstants;
 import com.stephenenright.typemapper.test.dto.vending.PaymentGatewayDto;
 import com.stephenenright.typemapper.test.dto.vending.PaymentProcessorDto;
@@ -112,6 +110,178 @@ public class TypeMappingServiceImplTest {
         PaymentGatewayDto resultGateway = result.getGateway();
         assertEquals(resultGateway.getId(), "Gateway 1");
     }
+    
+    
+    @Test
+    public void map_fromMap() {
+        Map<String,Object> map = new HashMap<>();
+        map.put("id", "V1");
+        map.put("name", "Vending Machine 1");
+        map.put("deleted", true);
+  
+        Map<String,Object> processor = new HashMap<String, Object>();
+        processor.put("id", "P1");
+        processor.put("name", "PRO Name 1");
+        processor.put("deleted", false);
+        
+        Map<String,Object> gateway = new HashMap<String, Object>();
+        gateway.put("id", "Gateway 1");
+        gateway.put("deleted", true);
+        processor.put("gateway", gateway);
+
+        map.put("processor", processor);
+        
+        Map<String, Object> configurationMap = new HashMap<String, Object>();
+        configurationMap.put("exactAmountRequired", false);
+        configurationMap.put("shutdownWhenEmpty", true);
+        List<Object> buttons = new LinkedList<Object>();
+        List<Object> buttonsWarnings = new LinkedList<Object>();
+        Map<String, Object> warningButton = new HashMap<>();
+        warningButton.put("name", "warnButton1");
+        buttonsWarnings.add(warningButton);
+        buttons.add(buttonsWarnings);
+        buttons.add("on button");
+        configurationMap.put("buttons", buttons);
+        
+        map.put("configuration", configurationMap);
+        
+        
+        Map<String,Object> categoryMap = new HashMap<String, Object>();
+        categoryMap.put("id","1");
+        categoryMap.put("name","Category 1");
+        categoryMap.put("deleted",false);
+        
+        Map<String,Object> productMap1 = new HashMap<>();
+        productMap1.put("id", "1");
+        productMap1.put("category",categoryMap);
+        productMap1.put("name","Product 1");
+        productMap1.put("deleted",false);
+        
+        
+        Map<String,Object> productMap2 = new HashMap<>();
+        productMap2.put("id", "2");
+        productMap2.put("category",categoryMap);
+        productMap2.put("name","Product 2");
+        productMap2.put("deleted",false);
+        
+ 
+        List<Map<String,Object>> slots = new LinkedList<>();
+
+        for (int j = 1; j <= 10; j++) {
+            Map<String,Object> slot = new HashMap<>();
+            slot.put("deleted",false);
+            slot.put("id",String.valueOf(j));
+            slot.put("code",String.valueOf(j));
+            slot.put("price",Double.valueOf(String.valueOf(j) + ".00"));
+            slots.add(slot);
+
+            Set<Map<String,Object>> slotProducts = new HashSet<>();
+            
+            Map<String,Object> slotProduct1 = new HashMap<>();
+            slotProduct1.put("slot", slot);
+            slotProduct1.put("product", productMap1);
+            Map<String,Object> id1 = new HashMap<>();
+            id1.put("productId", "1");
+            id1.put("slotId", String.valueOf(j));
+            slotProduct1.put("id", id1);
+            
+            Map<String,Object> slotProduct2 = new HashMap<>();
+            slotProduct2.put("slot", slot);
+            slotProduct2.put("product", productMap2);
+            Map<String,Object> id2 = new HashMap<>();
+            id2.put("productId", "2");
+            id2.put("slotId", String.valueOf(j));
+            slotProduct2.put("id", id2);
+            
+                slotProducts.add(slotProduct1);
+            slotProducts.add(slotProduct2);
+            slot.put("products", slotProducts);
+       
+        }
+
+        map.put("slots", slots);
+        
+    
+        VendingMachineDto result = mappingService.map(map, VendingMachineDto.class);
+        assertNotNull(result);
+        assertEquals("V1", result.getId());
+        assertEquals("Vending Machine 1", result.getName());
+        assertTrue("Vending Machine 1", result.isDeleted());
+        
+        
+        PaymentProcessorDto processorDto = result.getProcessor();
+        assertEquals("P1", processorDto.getId());
+        assertEquals("PRO Name 1", processorDto.getName());
+        assertEquals(false, processorDto.isDeleted());
+
+        PaymentGatewayDto gatewayDto = processorDto.getGateway();
+        assertNotNull(gatewayDto);
+        assertEquals("Gateway 1", gatewayDto.getId());
+        assertEquals(true, gatewayDto.isDeleted());
+        
+        Map<String, Object> configuration = result.getConfiguration();
+        assertTrue((Boolean) configuration.get("shutdownWhenEmpty"));
+        assertFalse((Boolean) configuration.get("exactAmountRequired"));
+
+        List<Object> resultButtons = (List<Object>) configuration.get("buttons");
+        assertTrue(resultButtons.size() == 2);
+
+        List<Object> resultWarningButtons = (List<Object>) resultButtons.get(0);
+        assertTrue(resultWarningButtons.size() == 1);
+        Map<String, Object> warningButton1 = (Map<String, Object>) resultWarningButtons.get(0);
+        assertEquals("warnButton1", warningButton1.get("name"));
+
+        String onButton = (String) resultButtons.get(1);
+        assertEquals("on button", onButton);
+        
+        
+
+        List<SlotDto> slotsDto = result.getSlots();
+        assertNotNull(slotsDto);
+        assertTrue(slotsDto.size() == 10);
+
+        for (int i = 0, j = 1; i < 10; i++, j++) {
+            SlotDto slotDto = slotsDto.get(i);
+            assertEquals(false, slotDto.isDeleted());
+            assertEquals(String.valueOf(j), slotDto.getId());
+            assertEquals(String.valueOf(j), slotDto.getCode());
+            assertEquals(Double.valueOf(String.valueOf(j) + ".00"), slotDto.getPrice());
+
+            Set<SlotProductDto> productDtoSet = slotDto.getProducts();
+            assertNotNull(productDtoSet);
+            assertEquals(2, productDtoSet.size());
+
+            Set<String> expectedProductIds = new HashSet<String>();
+            expectedProductIds.add("1");
+
+            for (SlotProductDto slotProductDto : productDtoSet) {
+                if (expectedProductIds.contains(slotProductDto.getId().getProductId())) {
+                    expectedProductIds.remove(slotProductDto.getId().getProductId());
+                }
+
+                assertNotNull(slotProductDto.getSlot());
+                assertEquals(String.valueOf(j), slotProductDto.getSlot().getId());
+
+                ProductDto productDto = slotProductDto.getProduct();
+                assertNotNull(productDto);
+
+                if (productDto.getId().equals("1")) {
+                    assertEquals("Product 1", productDto.getName());
+
+                } else if (productDto.getId().equals("2")) {
+                    assertEquals("Product 2", productDto.getName());
+                }
+
+                ProductCategoryDto categoryDto = productDto.getCategory();
+                assertEquals("1", categoryDto.getId());
+                assertEquals("Category 1", categoryDto.getName());
+            }
+
+            assertTrue(expectedProductIds.isEmpty());
+        } 
+    }
+    
+    
 
     @Test
     public void map() {

@@ -15,9 +15,6 @@ public class TypeTokenTest {
         TypeToken<VendingMachine> typeToken = TypeToken.of(VendingMachine.class);
         assertEquals(typeToken.getRawType(), VendingMachine.class);
         assertEquals(typeToken.getType(), VendingMachine.class);
-        System.out.println(typeToken.getType());
-        System.out.println(typeToken.getRawType());
-
     }
 
     @Test

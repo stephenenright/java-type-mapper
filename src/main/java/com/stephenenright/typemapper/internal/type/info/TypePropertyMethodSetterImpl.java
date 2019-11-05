@@ -3,12 +3,13 @@ package com.stephenenright.typemapper.internal.type.info;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
+import com.stephenenright.typemapper.TypeInfoRegistry;
 import com.stephenenright.typemapper.internal.common.error.Errors;
 
 class TypePropertyMethodSetterImpl extends TypePropertyInfoBase<Method> implements TypePropertySetter {
 
-    public TypePropertyMethodSetterImpl(String name, Class<?> type, Method method) {
-        super(name, type, method);
+    public TypePropertyMethodSetterImpl(String name, Class<?> type, Method method,TypeInfoRegistry typeInfoRegistry) {
+        super(name, type, method,typeInfoRegistry);
     }
 
     @Override

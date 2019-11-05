@@ -21,12 +21,9 @@ public class TypeConverterRegistryImplTest {
 
     @Test
     public void getConverter() {
-        TypeConverter<?,?> converter =  registry.getConverter(Integer.class, Long.class);
+        TypeConverter<?, ?> converter = registry.getConverter(Integer.class, Long.class);
         assertNotNull(converter);
-        
-        
-        
-        
+
     }
 
 }

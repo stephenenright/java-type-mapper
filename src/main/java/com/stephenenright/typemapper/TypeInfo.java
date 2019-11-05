@@ -18,26 +18,32 @@ public interface TypeInfo<T> {
      * @return the described objects class
      */
     Class<T> getType();
-    
-    
+
     /**
      * Returns the configuration used to describe this type
-     * @return  the configuration
+     * 
+     * @return the configuration
      */
     TypeMapperConfiguration getConfiguration();
-    
-    
+
     /**
      * Returns the object property getters of the described type
-     * @return  A <code> Map<String, TypePropertyGetter> of getter names to <code>TypePropertyGetter</code> instances.
+     * 
+     * @return A
+     *         <code> Map<String, TypePropertyGetter> of getter names to <code>TypePropertyGetter</code>
+     *         instances.
      */
     Map<String, TypePropertyGetter> getPropertyGetters();
 
-    
     /**
      * Returns the object property setters of the described type
-     * @return  A <code> Map<String, TypePropertySetter> of setter names to <code>TypePropertySetter</code> instances
+     * 
+     * @return A
+     *         <code> Map<String, TypePropertySetter> of setter names to <code>TypePropertySetter</code>
+     *         instances
      */
     Map<String, TypePropertySetter> getPropertySetters();
+
+    boolean isCacheable();
 
 }

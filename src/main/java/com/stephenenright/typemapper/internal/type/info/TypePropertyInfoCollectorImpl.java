@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.stephenenright.typemapper.TypeInfoRegistry;
 import com.stephenenright.typemapper.TypeIntrospector;
 import com.stephenenright.typemapper.TypeMapperConfiguration;
 import com.stephenenright.typemapper.internal.common.Pair;
@@ -20,38 +21,39 @@ public class TypePropertyInfoCollectorImpl implements TypePropertyInfoCollector 
     }
 
     @Override
-    public Pair<Map<String, TypePropertyGetter>, Map<String, TypePropertySetter>> collectProperties(Class<?> type,
-            TypeMapperConfiguration configuration) {
+    public Pair<Map<String, TypePropertyGetter>, Map<String, TypePropertySetter>> collectProperties(Object source,
+            Class<?> type, TypeMapperConfiguration configuration, TypeInfoRegistry registry) {
 
         Map<String, TypePropertyGetter> getterMap = new HashMap<>();
         Map<String, TypePropertySetter> setterMap = new HashMap<>();
 
-        collectMethods(type, configuration, getterMap, setterMap);
+        collectMethods(type, configuration, getterMap, setterMap, registry);
 
         return new Pair<Map<String, TypePropertyGetter>, Map<String, TypePropertySetter>>(getterMap, setterMap);
 
     }
 
     private void collectMethods(Class<?> type, TypeMapperConfiguration configuration,
-            Map<String, TypePropertyGetter> getterMap, Map<String, TypePropertySetter> setterMap) {
+            Map<String, TypePropertyGetter> getterMap, Map<String, TypePropertySetter> setterMap,
+            TypeInfoRegistry registry) {
 
         Method[] methods = introspector.getDeclaredMethods(type);
 
         for (Method method : methods) {
             boolean isAccessAllowed = MemberUtils.isMemberAccessAllowed(method, configuration.getAccessLevel());
-            
+
             if (!isAccessAllowed) {
                 continue;
             }
 
             if (isGetterMethod(method)) {
                 final String propertyName = JavaBeanUtils.extractPropertyNameFromGetter(method);
-                getterMap.put(propertyName, new TypePropertyMethodGetterImpl(propertyName, type, method));
+                getterMap.put(propertyName, new TypePropertyMethodGetterImpl(propertyName, type, method, registry));
                 MethodUtils.makeAccessible(method);
 
             } else if (isSetterMethod(method)) {
                 final String propertyName = JavaBeanUtils.extractPropertyNameFromSetter(method);
-                setterMap.put(propertyName, new TypePropertyMethodSetterImpl(propertyName, type, method));
+                setterMap.put(propertyName, new TypePropertyMethodSetterImpl(propertyName, type, method, registry));
                 MethodUtils.makeAccessible(method);
             }
         }
