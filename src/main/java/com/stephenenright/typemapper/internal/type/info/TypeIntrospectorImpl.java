@@ -1,13 +1,13 @@
 package com.stephenenright.typemapper.internal.type.info;
 
+import com.stephenenright.typemapper.TypeIntrospector;
+import com.stephenenright.typemapper.internal.collection.ConcurrentReferenceHashMap;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import com.stephenenright.typemapper.TypeIntrospector;
-import com.stephenenright.typemapper.internal.collection.ConcurrentReferenceHashMap;
 
 public class TypeIntrospectorImpl implements TypeIntrospector {
 
@@ -17,11 +17,33 @@ public class TypeIntrospectorImpl implements TypeIntrospector {
 
     @Override
     public Method[] getDeclaredMethods(Class<?> clazz) {
+        final List<Method> methods = new ArrayList<>(32);
+        doWithMethods(clazz, methods);
+        return methods.toArray(EMPTY_METHOD_ARRAY);
+    }
+
+    private void doWithMethods(Class<?> clazz, List<Method> methodsList) {
+        // Keep backing up the inheritance hierarchy.
+        Method[] methods = getDeclaredMethodsInternal(clazz);
+        for (Method method : methods) {
+            methodsList.add(method);
+        }
+        if (clazz.getSuperclass() != null && (clazz.getSuperclass() != Object.class)) {
+            doWithMethods(clazz.getSuperclass(), methodsList);
+        } else if (clazz.isInterface()) {
+            for (Class<?> superIfc : clazz.getInterfaces()) {
+                doWithMethods(superIfc, methodsList);
+            }
+        }
+    }
+
+
+    private static Method[] getDeclaredMethodsInternal(Class<?> clazz) {
         Method[] result = methodsCache.get(clazz);
         if (result == null) {
             try {
                 Method[] declaredMethods = clazz.getDeclaredMethods();
-                List<Method> defaultMethods = findMethodsForClass(clazz);
+                List<Method> defaultMethods = findConcreteMethodsOnInterfaces(clazz);
                 if (defaultMethods != null) {
                     result = new Method[declaredMethods.length + defaultMethods.size()];
                     System.arraycopy(declaredMethods, 0, result, 0, declaredMethods.length);
@@ -42,9 +64,9 @@ public class TypeIntrospectorImpl implements TypeIntrospector {
         return result;
     }
 
-    private static List<Method> findMethodsForClass(Class<?> cls) {
+    private static List<Method> findConcreteMethodsOnInterfaces(Class<?> clazz) {
         List<Method> result = null;
-        for (Class<?> ifc : cls.getInterfaces()) {
+        for (Class<?> ifc : clazz.getInterfaces()) {
             for (Method ifcMethod : ifc.getMethods()) {
                 if (!Modifier.isAbstract(ifcMethod.getModifiers())) {
                     if (result == null) {
@@ -56,5 +78,6 @@ public class TypeIntrospectorImpl implements TypeIntrospector {
         }
         return result;
     }
+
 
 }

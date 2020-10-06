@@ -4,8 +4,6 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nullable;
-
 import com.stephenenright.typemapper.DefaultMapperConfiguration;
 import com.stephenenright.typemapper.MapMapperConfiguration;
 import com.stephenenright.typemapper.TypeMapperConfiguration;
@@ -85,7 +83,7 @@ public class TypeMappingServiceImpl implements TypeMappingService {
         }
     }
 
-    private <D> D mapInternal(Object source, @Nullable D destination, Type destinationType,
+    private <D> D mapInternal(Object source, D destination, Type destinationType,
             TypeMapperConfiguration configuration, TypeMappingToStrategy mappingToStrategy) {
         if(source==null) {
             return null;
