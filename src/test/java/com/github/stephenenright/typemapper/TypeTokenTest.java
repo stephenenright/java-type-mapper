@@ -23,7 +23,7 @@ public class TypeTokenTest {
         };
         assertEquals(typeToken.getRawType(), List.class);
         assertEquals(typeToken.getType().toString(),
-                "java.util.List<com.stephenenright.typemapper.test.models.vending.VendingMachine>");
+                "java.util.List<com.github.stephenenright.typemapper.test.models.vending.VendingMachine>");
 
     }
 
