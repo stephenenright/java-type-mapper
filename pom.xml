@@ -192,9 +192,8 @@
 	</distributionManagement>
 
 	<scm>
-		<connection>scm:git:git://github.com/stephenenright/java-type-mapper.git</connection>
-		<developerConnection>scm:git:git@github.com:stephenenright/java-type-mapper.git</developerConnection>
 		<url>https://github.com/stephenenright/java-type-mapper</url>
-		<tag>type-mapper-1.0</tag>
+		<connection>scm:git:https://github.com/stephenenright/java-type-mapper.git</connection>
 	</scm>
+	
 </project>
