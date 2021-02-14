@@ -7,7 +7,26 @@
 	<packaging>jar</packaging>
 
 	<name>type-mapper</name>
+	<description>A project that simplifies mapping between java types. It also supports includes, and excludes and custom transformations.</description>
 	<url>http://maven.apache.org</url>
+
+
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>http://www.opensource.org/licenses/mit-license.php</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<email>stephen.enright@gmail.com</email>
+			<name>Stephen Enright</name>
+			<url>https://github.com/stephenenright</url>
+			<id>stephenenright</id>
+		</developer>
+	</developers>
 
 	<properties>
 		<org.reflections>0.9.10</org.reflections>
