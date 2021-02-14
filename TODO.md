@@ -1,4 +1,4 @@
 # type-mapper
 
-* Consider Improving Generic Type Resolving
+* Improve Generic Type Resolving
 
