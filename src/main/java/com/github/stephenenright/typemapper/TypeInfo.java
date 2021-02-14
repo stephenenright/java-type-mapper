@@ -26,21 +26,17 @@ public interface TypeInfo<T> {
      */
     TypeMapperConfiguration getConfiguration();
 
+
     /**
      * Returns the object property getters of the described type
-     * 
-     * @return A
-     *         <code> Map<String, TypePropertyGetter> of getter names to <code>TypePropertyGetter</code>
-     *         instances.
+     * @return
      */
     Map<String, TypePropertyGetter> getPropertyGetters();
 
+
     /**
      * Returns the object property setters of the described type
-     * 
-     * @return A
-     *         <code> Map<String, TypePropertySetter> of setter names to <code>TypePropertySetter</code>
-     *         instances
+     * @return
      */
     Map<String, TypePropertySetter> getPropertySetters();
 
