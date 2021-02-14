@@ -3,7 +3,7 @@
 
 	<groupId>com.github.stephenenright</groupId>
 	<artifactId>type-mapper</artifactId>
-	<version>1.0</version>
+	<version>1.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>type-mapper</name>
@@ -193,7 +193,9 @@
 
 	<scm>
 		<url>https://github.com/stephenenright/java-type-mapper</url>
-		<connection>scm:git:https://github.com/stephenenright/java-type-mapper.git</connection>
-	</scm>
+		<connection>scm:git:git://github.com/stephenenright/java-type-mapper.git</connection>
+	  <developerConnection>scm:git:git@github.com:stephenenright/java-type-mapper.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
 	
 </project>
