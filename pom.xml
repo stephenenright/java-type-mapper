@@ -10,7 +10,6 @@
 	<description>A project that simplifies mapping between java types. It also supports includes, and excludes and custom transformations.</description>
 	<url>https://github.com/stephenenright/java-type-mapper</url>
 
-
 	<licenses>
 		<license>
 			<name>MIT License</name>
@@ -216,5 +215,4 @@
 	  	<developerConnection>scm:git:git@github.com:stephenenright/java-type-mapper.git</developerConnection>
     	<tag>HEAD</tag>
   	</scm>
-	
 </project>
