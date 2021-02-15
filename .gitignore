@@ -3,6 +3,8 @@ target/
 tmlog*
 logs/
 bin/*
+release.properties
+pom.xml.releaseBackup
 
 ### STS ###
 .apt_generated

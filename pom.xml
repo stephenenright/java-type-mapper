@@ -8,7 +8,7 @@
 
 	<name>type-mapper</name>
 	<description>A project that simplifies mapping between java types. It also supports includes, and excludes and custom transformations.</description>
-	<url>http://maven.apache.org</url>
+	<url>https://github.com/stephenenright/java-type-mapper</url>
 
 
 	<licenses>
@@ -213,8 +213,8 @@
 	<scm>
 		<url>https://github.com/stephenenright/java-type-mapper</url>
 		<connection>scm:git:git://github.com/stephenenright/java-type-mapper.git</connection>
-	  <developerConnection>scm:git:git@github.com:stephenenright/java-type-mapper.git</developerConnection>
-    <tag>HEAD</tag>
-  </scm>
+	  	<developerConnection>scm:git:git@github.com:stephenenright/java-type-mapper.git</developerConnection>
+    	<tag>HEAD</tag>
+  	</scm>
 	
 </project>
