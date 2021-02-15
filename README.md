@@ -100,3 +100,14 @@ We can also map a list of elements to a list of maps
 ```
 
 This mapper also supports the configuration options discussed previously such as access level, includes, excludes, transformations etc.
+
+
+#Installation
+
+```
+<dependency>
+  <groupId>com.github.stephenenright</groupId>
+  <artifactId>type-mapper</artifactId>
+  <version>1.1</version>
+</dependency>
+```
